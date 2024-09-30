@@ -1,27 +1,28 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
+import Link from "next/link";
+import { IMenuItem } from "./login/type";
 
-const menuItems = [
+const menuItems: IMenuItem[] = [
   {
-    title: 'Món ăn',
-    href: '/menu'
+    title: "Dish",
+    href: "/menu",
   },
   {
-    title: 'Đơn hàng',
-    href: '/orders'
+    title: "Order",
+    href: "/orders",
   },
   {
-    title: 'Đăng nhập',
-    href: '/login',
-    authRequired: false
+    title: "Login",
+    href: "/login",
+    authRequired: false,
   },
   {
-    title: 'Quản lý',
-    href: '/manage/dashboard',
-    authRequired: true
-  }
-]
+    title: "Management",
+    href: "/manage/dashboard",
+    authRequired: true,
+  },
+];
 
 export default function NavItems({ className }: { className?: string }) {
   return menuItems.map((item) => {
@@ -29,6 +30,6 @@ export default function NavItems({ className }: { className?: string }) {
       <Link href={item.href} key={item.href} className={className}>
         {item.title}
       </Link>
-    )
-  })
+    );
+  });
 }

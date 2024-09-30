@@ -25,12 +25,10 @@ export default function LoginForm() {
 
   return (
     <Card className="mx-auto max-w-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl">Đăng nhập</CardTitle>
-        <Button variant="outline">Button123</Button>
-
+      <CardHeader className="flex justify-center items-center">
+        <CardTitle className="text-4xl font-bold">Login</CardTitle>
         <CardDescription>
-          Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống
+          Enter your email and password to login system
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -50,7 +48,7 @@ export default function LoginForm() {
                       <Input
                         id="email"
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder="example@gmail.com"
                         required
                         {...field}
                       />
@@ -80,10 +78,10 @@ export default function LoginForm() {
                 )}
               />
               <Button type="submit" className="w-full">
-                Đăng nhập
+                Login
               </Button>
               <Button variant="outline" className="w-full" type="button">
-                Đăng nhập bằng Google
+                Login with Google
               </Button>
             </div>
           </form>
