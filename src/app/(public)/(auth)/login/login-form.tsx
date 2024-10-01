@@ -16,27 +16,26 @@ import { useLoginMutation } from "@/queries/useAuth";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { initLoginValue } from "./const";
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation();
-  const form = useForm<LoginBodyType>({
+  const loginForm = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: initLoginValue,
   });
+
+  const { setError, handleSubmit, control } = loginForm;
 
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {
       const result = await loginMutation.mutateAsync(data);
-      console.log("result", result);
       toast({ description: result.payload.message });
     } catch (error) {
       handleErrorApi({
         error,
-        setError: form.setError,
+        setError,
       });
     }
   };
@@ -50,17 +49,17 @@ export default function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
+        <Form {...loginForm}>
           <form
             className="space-y-2 max-w-[600px] flex-shrink-0 w-full"
             noValidate
-            onSubmit={form.handleSubmit(onSubmit, (err) => {
+            onSubmit={handleSubmit(onSubmit, (err) => {
               console.log(err);
             })}
           >
             <div className="grid gap-4">
               <FormField
-                control={form.control}
+                control={control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -79,7 +78,7 @@ export default function LoginForm() {
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
