@@ -1,4 +1,4 @@
-import { envConfig } from "@/config";
+import { envConfig } from "@/config/enviroment";
 import { normalizePath } from "@/lib/utils";
 import { LoginResType } from "@/schemaValidations/auth.schema";
 import { redirect } from "next/navigation";
@@ -82,9 +82,11 @@ const request = async <Response>(
       baseHeaders.Authorization = `Bearer ${accessToken}`;
     }
   }
+
+  console.log("baseHeaders", baseHeaders);
   // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.NEXT_PUBLIC_API_ENDPOINT
   // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server
-
+  console.log("options", options);
   const baseUrl =
     options?.baseUrl === undefined
       ? envConfig.NEXT_PUBLIC_API_ENDPOINT
@@ -105,6 +107,8 @@ const request = async <Response>(
     status: res.status,
     payload,
   };
+  console.log("res", res);
+  console.log("isClient", isClient);
   // Interceptor là nơi chúng ta xử lý request và response trước khi trả về cho phía component
   if (!res.ok) {
     if (res.status === ENTITY_ERROR_STATUS) {

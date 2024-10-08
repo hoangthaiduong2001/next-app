@@ -1,4 +1,4 @@
-import http from "@/lib/http";
+import http from "@/config/http";
 import { LoginBodyType, LoginResType } from "@/schemaValidations/auth.schema";
 
 export const authApiRequest = {
