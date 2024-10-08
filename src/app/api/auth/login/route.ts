@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   const body = (await request.json()) as LoginBodyType;
   const cookieStore = cookies();
   try {
-    const { response } = await authApiRequest.sLogin(body);
+    const { response } = await authApiRequest.serverLogin(body);
     const { accessToken, refreshToken } = response.data;
     const decodeAccessToken = jwt.decode(accessToken) as { exp: number };
     const decodeRefreshToken = jwt.decode(refreshToken) as { exp: number };
