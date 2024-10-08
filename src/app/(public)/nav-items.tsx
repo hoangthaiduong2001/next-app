@@ -3,7 +3,7 @@
 import { getAccessTokenFromLocalStorage } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { IMenuItem } from "./login/type";
+import { IMenuItem } from "./(auth)/login/type";
 
 const menuItems: IMenuItem[] = [
   {
