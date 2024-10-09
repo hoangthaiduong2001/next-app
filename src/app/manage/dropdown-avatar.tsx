@@ -1,4 +1,5 @@
 "use client";
+import CommonPopup from "@/components/component/CommonPopup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
+import { handleErrorApi } from "@/lib/utils";
+import { useLogoutMutation } from "@/queries/useAuth";
+import { MessageResType } from "@/schemaValidations/common.schema";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const account = {
   name: "Admin",
@@ -17,6 +23,20 @@ const account = {
 };
 
 export default function DropdownAvatar() {
+  const logoutMutation = useLogoutMutation();
+  const route = useRouter();
+  const handleLogout = async () => {
+    if (logoutMutation.isPending) return;
+    try {
+      const result = await logoutMutation.mutateAsync();
+      route.push("/");
+      toast({ description: (result.response as MessageResType).message });
+    } catch (error) {
+      handleErrorApi({
+        error,
+      });
+    }
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -43,7 +63,13 @@ export default function DropdownAvatar() {
         </DropdownMenuItem>
         <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <CommonPopup
+          title="Logout"
+          label="Confirm logout"
+          content="Are you want logout?"
+          labelSubmit="Logout"
+          onSubmit={handleLogout}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -15,10 +15,12 @@ import { handleErrorApi } from "@/lib/utils";
 import { useLoginMutation } from "@/queries/useAuth";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { initLoginValue } from "./const";
 
 export default function LoginForm() {
+  const route = useRouter();
   const loginMutation = useLoginMutation();
   const loginForm = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -30,8 +32,12 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {
-      const result = await loginMutation.mutateAsync(data);
-      toast({ description: result.response.message });
+      await loginMutation
+        .mutateAsync(data)
+        .catch((error) => console.log("1234", error));
+      // toast({ description: result.response.message });
+      toast({ description: "ok nha" });
+      route.push("/manage/dashboard");
     } catch (error) {
       handleErrorApi({
         error,
