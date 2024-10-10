@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { handleErrorApi } from "@/lib/utils";
 import { useLoginMutation } from "@/queries/useAuth";
+import { pathApp } from "@/routes/path";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -32,12 +33,9 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {
-      await loginMutation
-        .mutateAsync(data)
-        .catch((error) => console.log("1234", error));
-      // toast({ description: result.response.message });
-      toast({ description: "ok nha" });
-      route.push("/manage/dashboard");
+      const result = await loginMutation.mutateAsync(data);
+      toast({ description: result.response.message });
+      route.push(pathApp.manage.dashboard);
     } catch (error) {
       handleErrorApi({
         error,

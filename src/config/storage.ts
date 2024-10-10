@@ -55,7 +55,7 @@ export const axiosHttp = (
 ): AxiosInstance => {
   const axiosInstance = axios.create({
     baseURL,
-    timeout: 1000,
+    timeout: 5000,
     headers,
   });
   return axiosInstance;

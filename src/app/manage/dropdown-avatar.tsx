@@ -11,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
-import { handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { MessageResType } from "@/schemaValidations/common.schema";
 import Link from "next/link";
@@ -32,9 +31,7 @@ export default function DropdownAvatar() {
       route.push("/");
       toast({ description: (result.response as MessageResType).message });
     } catch (error) {
-      handleErrorApi({
-        error,
-      });
+      toast({ description: "Can not logout" });
     }
   };
   return (

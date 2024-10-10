@@ -1,8 +1,9 @@
 import { authApiRequest } from "@/apiRequest/auth";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants/auth";
+import { HTTP_STATUS } from "@/constants/status";
 import { cookies } from "next/headers";
 
-export async function POST(request: Request) {
+export async function POST() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN)?.value || "";
   const refreshToken = cookieStore.get(REFRESH_TOKEN)?.value || "";
@@ -11,15 +12,15 @@ export async function POST(request: Request) {
       refreshToken,
       accessToken,
     });
-    if (result.status === 200) {
+    if (result.status === HTTP_STATUS.OK) {
       cookieStore.delete(ACCESS_TOKEN);
       cookieStore.delete(REFRESH_TOKEN);
     }
     return Response.json(result.response);
   } catch {
     return Response.json({
-      message: "Error logout in backend",
-      status: 200,
+      message: "Error logout in client",
+      status: HTTP_STATUS.OK,
     });
   }
 }

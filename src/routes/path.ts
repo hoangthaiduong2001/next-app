@@ -7,4 +7,8 @@ export const pathServer = {
   login: "/auth/login",
 };
 
-export const pathApp = {};
+export const pathApp = {
+  manage: {
+    dashboard: "/manage/dashboard",
+  },
+};

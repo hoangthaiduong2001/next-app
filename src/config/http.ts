@@ -1,8 +1,6 @@
 import { envConfig } from "@/config/enviroment";
-import {
-  AUTHENTICATION_ERROR_STATUS,
-  FORBIDDEN_ERROR_STATUS,
-} from "@/constants/status";
+
+import { HTTP_STATUS } from "@/constants/status";
 import { normalizePath } from "@/lib/utils";
 import { pathClient, pathServer } from "@/routes/path";
 import {
@@ -104,8 +102,8 @@ const request = async <Response>(
     async (error: AxiosError): Promise<ErrorResponseDto | undefined> => {
       const errorStatusCode = error.response?.status;
       if (
-        (errorStatusCode === AUTHENTICATION_ERROR_STATUS ||
-          errorStatusCode === FORBIDDEN_ERROR_STATUS) &&
+        (errorStatusCode === HTTP_STATUS.UNAUTHORIZED ||
+          errorStatusCode === HTTP_STATUS.FORBIDDEN) &&
         !error.config?.url?.includes("api/auth/login")
       ) {
         if (!refreshTokenPromise) {

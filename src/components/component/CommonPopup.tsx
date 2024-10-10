@@ -26,7 +26,12 @@ const CommonPopup = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">{title}</Button>
+        <Button
+          variant="outline"
+          className="flex w-full justify-start border-none"
+        >
+          {title}
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
