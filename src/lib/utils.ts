@@ -3,7 +3,6 @@ import { toast } from "@/hooks/use-toast";
 import { clsx, type ClassValue } from "clsx";
 import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
-import { EntityError } from "./http";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -19,11 +18,11 @@ export const handleErrorApi = ({
   duration,
 }: {
   error: any;
-  setError?: UseFormSetError<any>;
+  setError: UseFormSetError<any>;
   duration?: number;
 }) => {
-  if (error instanceof EntityError && setError) {
-    error.payload.errors.forEach((item) => {
+  if (error.response.data.error) {
+    error.response.data.error.forEach((item: any) => {
       setError(item.field, {
         type: "server",
         message: item.message,
@@ -32,7 +31,7 @@ export const handleErrorApi = ({
   } else {
     toast({
       title: "Error",
-      description: error?.payload?.message ?? "Error not identify",
+      description: error.response.data.message ?? "Error not identify",
       variant: "destructive",
       duration: duration ?? 5000,
     });

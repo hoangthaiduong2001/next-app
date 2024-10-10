@@ -13,12 +13,15 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { handleErrorApi } from "@/lib/utils";
 import { useLoginMutation } from "@/queries/useAuth";
+import { pathApp } from "@/routes/path";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { initLoginValue } from "./const";
 
 export default function LoginForm() {
+  const route = useRouter();
   const loginMutation = useLoginMutation();
   const loginForm = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -32,6 +35,7 @@ export default function LoginForm() {
     try {
       const result = await loginMutation.mutateAsync(data);
       toast({ description: result.response.message });
+      route.push(pathApp.manage.dashboard);
     } catch (error) {
       handleErrorApi({
         error,

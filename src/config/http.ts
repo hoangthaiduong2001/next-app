@@ -1,19 +1,24 @@
 import { envConfig } from "@/config/enviroment";
-import {
-  AUTHENTICATION_ERROR_STATUS,
-  FORBIDDEN_ERROR_STATUS,
-} from "@/constants/status";
+
+import { HTTP_STATUS } from "@/constants/status";
 import { normalizePath } from "@/lib/utils";
+import { pathClient, pathServer } from "@/routes/path";
 import {
   LoginResType,
   RefreshTokenResType,
 } from "@/schemaValidations/auth.schema";
 import { CustomOptions, IPlainObject } from "@/types/common";
 import { ErrorResponseDto } from "@/types/error";
-import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import {
+  AxiosError,
+  AxiosHeaders,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
 import {
   axiosHttp,
   clearCacheAndNavigateToLoginPage,
+  clearPersistToken,
   getAccessToken,
   persistTokenAndAccount,
   refreshTokenFn,
@@ -42,12 +47,18 @@ const request = async <Response>(
   } else if (options?.body) {
     body = JSON.stringify(options.body);
   }
+
   const baseHeaders: IPlainObject =
     body instanceof FormData
       ? {}
       : {
           "Content-Type": "application/json",
         };
+  if (!isClient && url !== pathServer.login) {
+    baseHeaders.Authorization = (
+      options?.headers as AxiosHeaders
+    ).Authorization;
+  }
   const axiosInstance = axiosHttp(baseUrl, baseHeaders);
   const fullUrl = `${baseUrl}/${normalizePath(url)}`;
   const res = await axiosInstance({
@@ -63,18 +74,25 @@ const request = async <Response>(
     status: res.status,
     response: responseData,
   };
-  if (isClient && url === "/api/auth/login") {
-    const data = responseData as LoginResType;
-    persistTokenAndAccount(data);
+  if (isClient) {
+    if (url === pathClient.login) {
+      const data = responseData as LoginResType;
+      persistTokenAndAccount(data);
+    } else if (url === pathClient.logout) {
+      clearPersistToken();
+    }
   }
+
   axiosInstance.interceptors.request.use((config) => {
     config.paramsSerializer = {
       indexes: null,
     };
+
     const accessToken = getAccessToken();
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+    console.log("config", config);
     return config;
   });
   axiosInstance.interceptors.response.use(
@@ -84,8 +102,8 @@ const request = async <Response>(
     async (error: AxiosError): Promise<ErrorResponseDto | undefined> => {
       const errorStatusCode = error.response?.status;
       if (
-        (errorStatusCode === AUTHENTICATION_ERROR_STATUS ||
-          errorStatusCode === FORBIDDEN_ERROR_STATUS) &&
+        (errorStatusCode === HTTP_STATUS.UNAUTHORIZED ||
+          errorStatusCode === HTTP_STATUS.FORBIDDEN) &&
         !error.config?.url?.includes("api/auth/login")
       ) {
         if (!refreshTokenPromise) {
