@@ -13,6 +13,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useAccountProfile } from "@/queries/useAccount";
 import { useLogoutMutation } from "@/queries/useAuth";
+import { pathApp } from "@/routes/path";
 import { MessageResType } from "@/schemaValidations/common.schema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -55,7 +56,7 @@ export default function DropdownAvatar() {
         <DropdownMenuLabel>{account?.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={"/manage/setting"} className="cursor-pointer">
+          <Link href={pathApp.manage.setting} className="cursor-pointer">
             Setting
           </Link>
         </DropdownMenuItem>
