@@ -1,5 +1,5 @@
 "use client";
-import menuItems from "@/app/manage/menuItems";
+import menuItems from "@/app/manage/component/menuItems";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

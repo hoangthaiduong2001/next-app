@@ -1,3 +1,4 @@
+import { pathApp } from "@/routes/path";
 import {
   Home,
   LineChart,
@@ -11,33 +12,33 @@ const menuItems = [
   {
     title: "Dashboard",
     Icon: Home,
-    href: "/manage/dashboard",
+    href: pathApp.manage.dashboard,
   },
   {
     title: "Order",
     Icon: ShoppingCart,
-    href: "/manage/orders",
+    href: pathApp.manage.oder,
   },
   {
     title: "Table",
     Icon: Table,
-    href: "/manage/tables",
+    href: pathApp.manage.table,
   },
   {
     title: "Dish",
     Icon: Salad,
-    href: "/manage/dishes",
+    href: pathApp.manage.dish,
   },
 
   {
     title: "Analytic",
     Icon: LineChart,
-    href: "/manage/analytics",
+    href: pathApp.manage.analytic,
   },
   {
     title: "Staff",
     Icon: Users2,
-    href: "/manage/staffs",
+    href: pathApp.manage.staff,
   },
 ];
 

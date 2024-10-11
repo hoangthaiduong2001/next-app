@@ -10,5 +10,11 @@ export const pathServer = {
 export const pathApp = {
   manage: {
     dashboard: "/manage/dashboard",
+    oder: "/manage/orders",
+    table: "/manage/tables",
+    dish: "/manage/dishes",
+    analytic: "/manage/analytics",
+    staff: "/manage/staffs",
+    setting: "/manage/setting",
   },
 };
