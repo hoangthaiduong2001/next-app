@@ -11,19 +11,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
+import { useAccountProfile } from "@/queries/useAccount";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { MessageResType } from "@/schemaValidations/common.schema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const account = {
-  name: "Admin",
-  avatar: "https://i.pravatar.cc/150",
-};
-
 export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const route = useRouter();
+  const { data } = useAccountProfile();
+  const account = data?.response.data;
   const handleLogout = async () => {
     if (logoutMutation.isPending) return;
     try {
@@ -43,15 +41,18 @@ export default function DropdownAvatar() {
           className="overflow-hidden rounded-full"
         >
           <Avatar>
-            <AvatarImage src={account.avatar ?? undefined} alt={account.name} />
+            <AvatarImage
+              src={account?.avatar ?? undefined}
+              alt={account?.name}
+            />
             <AvatarFallback>
-              {account.name.slice(0, 2).toUpperCase()}
+              {account?.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>{account.name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{account?.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href={"/manage/setting"} className="cursor-pointer">

@@ -38,9 +38,13 @@ const request = async <Response>(
   options?: CustomOptions | undefined
 ) => {
   let body: FormData | string | undefined = undefined;
-  const baseUrl = isClient
-    ? envConfig.NEXT_PUBLIC_URL
-    : envConfig.NEXT_PUBLIC_API_ENDPOINT;
+  // const baseUrl = isClient
+  //   ? envConfig.NEXT_PUBLIC_URL
+  //   : envConfig.NEXT_PUBLIC_API_ENDPOINT;
+  const baseUrl =
+    options?.baseUrl === undefined
+      ? envConfig.NEXT_PUBLIC_API_ENDPOINT
+      : options.baseUrl;
 
   if (options?.body instanceof FormData) {
     body = options.body;
@@ -92,7 +96,6 @@ const request = async <Response>(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    console.log("config", config);
     return config;
   });
   axiosInstance.interceptors.response.use(
