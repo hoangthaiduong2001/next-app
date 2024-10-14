@@ -1,35 +1,15 @@
 import { envConfig } from "@/config/enviroment";
 
-import { HTTP_STATUS } from "@/constants/status";
 import { normalizePath } from "@/lib/utils";
 import { pathClient, pathServer } from "@/routes/path";
-import {
-  LoginResType,
-  RefreshTokenResType,
-} from "@/schemaValidations/auth.schema";
+import { LoginResType } from "@/schemaValidations/auth.schema";
 import { CustomOptions, IPlainObject } from "@/types/common";
-import { ErrorResponseDto } from "@/types/error";
-import {
-  AxiosError,
-  AxiosHeaders,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from "axios";
-import {
-  axiosHttp,
-  clearCacheAndNavigateToLoginPage,
-  clearPersistToken,
-  getAccessToken,
-  persistTokenAndAccount,
-  refreshTokenFn,
-  removeAccessToken,
-} from "./storage";
+import { AxiosHeaders } from "axios";
+import axiosHttp from "./axiosConfig";
+import { clearPersistToken, persistTokenAndAccount } from "./storage";
 
 // let clientLogoutRequest: null | Promise<any> = null;
 
-const isNavigatingLoginPage = false;
-let refreshTokenPromise: Promise<RefreshTokenResType | undefined> | null;
-const clearPromise = () => (refreshTokenPromise = null);
 const isClient = typeof window !== "undefined";
 
 const request = async <Response>(
@@ -38,9 +18,6 @@ const request = async <Response>(
   options?: CustomOptions | undefined
 ) => {
   let body: FormData | string | undefined = undefined;
-  // const baseUrl = isClient
-  //   ? envConfig.NEXT_PUBLIC_URL
-  //   : envConfig.NEXT_PUBLIC_API_ENDPOINT;
   const baseUrl =
     options?.baseUrl === undefined
       ? envConfig.NEXT_PUBLIC_API_ENDPOINT
@@ -63,7 +40,8 @@ const request = async <Response>(
       options?.headers as AxiosHeaders
     ).Authorization;
   }
-  const axiosInstance = axiosHttp(baseUrl, baseHeaders);
+  const axiosInstance = axiosHttp({ baseURL: baseUrl, headers: baseHeaders });
+
   const fullUrl = `${baseUrl}/${normalizePath(url)}`;
   const res = await axiosInstance({
     method,
@@ -86,46 +64,6 @@ const request = async <Response>(
       clearPersistToken();
     }
   }
-
-  axiosInstance.interceptors.request.use((config) => {
-    config.paramsSerializer = {
-      indexes: null,
-    };
-
-    const accessToken = getAccessToken();
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  });
-  axiosInstance.interceptors.response.use(
-    (response: AxiosResponse) => {
-      return response;
-    },
-    async (error: AxiosError): Promise<ErrorResponseDto | undefined> => {
-      const errorStatusCode = error.response?.status;
-      if (
-        (errorStatusCode === HTTP_STATUS.UNAUTHORIZED ||
-          errorStatusCode === HTTP_STATUS.FORBIDDEN) &&
-        !error.config?.url?.includes("api/auth/login")
-      ) {
-        if (!refreshTokenPromise) {
-          removeAccessToken();
-          refreshTokenPromise = refreshTokenFn().finally(clearPromise);
-        }
-        const result = await refreshTokenPromise;
-        const accessToken = result?.data.accessToken;
-        if (accessToken) {
-          const originalConfig: InternalAxiosRequestConfig =
-            error.config as InternalAxiosRequestConfig;
-          originalConfig.headers.Authorization = `Bearer ${accessToken}`;
-          return axiosInstance.request({ ...originalConfig });
-        }
-      } else {
-        clearCacheAndNavigateToLoginPage(error, isNavigatingLoginPage);
-      }
-    }
-  );
 
   return data;
 };
