@@ -31,7 +31,6 @@ export default function ChangePasswordForm() {
         <Card className="overflow-hidden" x-chunk="dashboard-07-chunk-4">
           <CardHeader>
             <CardTitle>Change password</CardTitle>
-            {/* <CardDescription>Lipsum dolor sit amet, consectetur adipiscing elit</CardDescription> */}
           </CardHeader>
           <CardContent>
             <div className="grid gap-6">
