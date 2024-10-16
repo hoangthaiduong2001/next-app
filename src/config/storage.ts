@@ -7,7 +7,7 @@ import {
 } from "@/schemaValidations/auth.schema";
 import { IPlainObject } from "@/types/common";
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
-
+import Cookies from "js-cookie";
 export const persistTokenAndAccount = (data: LoginResType) => {
   const {
     data: { accessToken, refreshToken, account },
@@ -31,12 +31,19 @@ export const getAccessToken = () => {
 };
 
 export const getRefreshToken = () => {
-  const token = localStorage.getItem(REFRESH_TOKEN) as string;
+  let token = "";
+  if (typeof window !== "undefined") {
+    token = localStorage.getItem(REFRESH_TOKEN) as string;
+  } else {
+    token = Cookies.get(REFRESH_TOKEN) || "";
+  }
   return token;
 };
 
 export const removeAccessToken = () => {
-  localStorage.removeItem(ACCESS_TOKEN);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(ACCESS_TOKEN);
+  }
 };
 
 export const removeRefreshToken = () => {
@@ -65,7 +72,18 @@ export const refreshTokenFn = async (): Promise<
   RefreshTokenResType | undefined
 > => {
   const refreshToken = getRefreshToken();
+  console.log("refreshToken", refreshToken);
   try {
+    console.log("456");
+    await axios
+      .post<
+        RefreshTokenResType,
+        AxiosResponse<RefreshTokenResType, RefreshTokenBodyType>,
+        RefreshTokenBodyType
+      >("/auth/refresh-token", {
+        refreshToken,
+      })
+      .catch((err) => console.log("loi o day", err));
     const res = await axios.post<
       RefreshTokenResType,
       AxiosResponse<RefreshTokenResType, RefreshTokenBodyType>,
@@ -74,10 +92,11 @@ export const refreshTokenFn = async (): Promise<
       refreshToken,
     });
     const { data } = res;
+    console.log("refretokenres", res);
     persistToken(data);
     return data;
   } catch (error) {
-    console.log(error);
+    console.log("error in refreserToken", error);
   }
 };
 

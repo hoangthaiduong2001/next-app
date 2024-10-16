@@ -7,6 +7,8 @@ export async function POST() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN)?.value || "";
   const refreshToken = cookieStore.get(REFRESH_TOKEN)?.value || "";
+  cookieStore.delete(ACCESS_TOKEN);
+  cookieStore.delete(REFRESH_TOKEN);
   try {
     const result = await authApiRequest.serverLogout({
       refreshToken,

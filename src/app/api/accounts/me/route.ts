@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 export async function GET() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN)?.value || "";
+  console.log("accessToken get me", accessToken);
   try {
     const result = await accountApiRequest.serverGetAccount(accessToken);
     return Response.json(result.response);

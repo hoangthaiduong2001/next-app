@@ -3,7 +3,10 @@ import {
   LoginBodyType,
   LoginResType,
   LogoutBodyType,
+  RefreshTokenBodyType,
+  RefreshTokenResType,
 } from "@/schemaValidations/auth.schema";
+import axios from "axios";
 
 export const authApiRequest = {
   serverLogin: (body: LoginBodyType) =>
@@ -20,6 +23,13 @@ export const authApiRequest = {
         },
       }
     ),
+  serverRefreshToken: (body: RefreshTokenBodyType) =>
+    axios.post<RefreshTokenResType>(
+      "http://localhost:4000/auth/refresh-token",
+      {
+        refreshToken: body.refreshToken,
+      }
+    ),
   clientLogin: (body: LoginBodyType) =>
     http.post<LoginResType>("/api/auth/login", body, {
       baseUrl: "",
@@ -28,4 +38,9 @@ export const authApiRequest = {
     http.post("/api/auth/logout", null, {
       baseUrl: "",
     }),
+  clientRefreshToken: (body: RefreshTokenBodyType) =>
+    axios.post<RefreshTokenResType>(
+      "http://localhost:3000/api/auth/refresh-token",
+      { refreshToken: body.refreshToken }
+    ),
 };
