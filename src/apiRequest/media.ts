@@ -1,5 +1,4 @@
 import http from "@/config/http";
-import { AccountResType } from "@/schemaValidations/account.schema";
 import { UploadImageResType } from "@/schemaValidations/media.schema";
 
 const mediaApiRequest = {
@@ -10,7 +9,7 @@ const mediaApiRequest = {
       },
     }),
   clientUploadImage: (formData: FormData) =>
-    http.post<AccountResType>("/api/media/upload", formData, {
+    http.post<UploadImageResType>("/api/media/upload", formData, {
       baseUrl: "",
     }),
 };

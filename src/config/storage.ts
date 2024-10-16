@@ -2,12 +2,10 @@ import { ACCESS_TOKEN, REFRESH_TOKEN, USER_INFO } from "@/constants/auth";
 import { toast } from "@/hooks/use-toast";
 import {
   LoginResType,
-  RefreshTokenBodyType,
   RefreshTokenResType,
 } from "@/schemaValidations/auth.schema";
 import { IPlainObject } from "@/types/common";
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
-
+import axios, { AxiosError, AxiosInstance } from "axios";
 export const persistTokenAndAccount = (data: LoginResType) => {
   const {
     data: { accessToken, refreshToken, account },
@@ -31,12 +29,17 @@ export const getAccessToken = () => {
 };
 
 export const getRefreshToken = () => {
-  const token = localStorage.getItem(REFRESH_TOKEN) as string;
+  let token = "";
+  if (typeof window !== "undefined") {
+    token = localStorage.getItem(REFRESH_TOKEN) as string;
+  }
   return token;
 };
 
 export const removeAccessToken = () => {
-  localStorage.removeItem(ACCESS_TOKEN);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(ACCESS_TOKEN);
+  }
 };
 
 export const removeRefreshToken = () => {
@@ -59,26 +62,6 @@ export const axiosHttp = (
     headers,
   });
   return axiosInstance;
-};
-
-export const refreshTokenFn = async (): Promise<
-  RefreshTokenResType | undefined
-> => {
-  const refreshToken = getRefreshToken();
-  try {
-    const res = await axios.post<
-      RefreshTokenResType,
-      AxiosResponse<RefreshTokenResType, RefreshTokenBodyType>,
-      RefreshTokenBodyType
-    >("/auth/refresh-token", {
-      refreshToken,
-    });
-    const { data } = res;
-    persistToken(data);
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 export const clearCacheAndNavigateToLoginPage = (
