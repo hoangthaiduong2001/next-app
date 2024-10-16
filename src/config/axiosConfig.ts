@@ -21,7 +21,6 @@ const isServer = () => {
   return typeof window === "undefined";
 };
 
-const isNavigatingLoginPage = false;
 let refreshTokenPromise: Promise<RefreshTokenResType | undefined> | null;
 const clearPromise = () => (refreshTokenPromise = null);
 
@@ -62,34 +61,28 @@ const axiosHttp = ({
           errorStatusCode === HTTP_STATUS.FORBIDDEN) &&
         !error.config?.url?.includes("api/auth/login")
       ) {
-        console.log("error", error.response);
         let refreshToken = "";
         if (isServer()) {
           refreshToken = cookieStore.get("refreshToken")?.value || "";
         }
 
         if (!refreshTokenPromise) {
-          // clearAccessToken();
-
           refreshTokenPromise = authApiRequest
             .clientRefreshToken({
               refreshToken,
             })
-            .finally(clearPromise) as any;
+            .then((response) => response.data)
+            .finally(clearPromise);
         }
 
         const result = await refreshTokenPromise;
-        console.log("456", result);
         if (result) {
-          console.log("123", result);
-          const accessToken = (result?.data as any).data.accessToken;
-          const refreshToken = (result?.data as any).data.refreshToken;
+          const { accessToken, refreshToken } = result?.data;
           cookieStore.set(ACCESS_TOKEN, accessToken);
           cookieStore.set(REFRESH_TOKEN, refreshToken);
           const originalConfig: InternalAxiosRequestConfig =
             error.config as InternalAxiosRequestConfig;
           originalConfig.headers.Authorization = `Bearer ${accessToken}`;
-          console.log("originalConfig", originalConfig);
           return axiosInstance(originalConfig);
         }
       } else {

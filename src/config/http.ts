@@ -41,7 +41,6 @@ const request = async <Response>(
     ).Authorization;
   }
   const axiosInstance = axiosHttp({ baseURL: baseUrl, headers: baseHeaders });
-  console.log("axiosInstance", axiosInstance);
 
   const fullUrl = `${baseUrl}/${normalizePath(url)}`;
   const res = await axiosInstance({
