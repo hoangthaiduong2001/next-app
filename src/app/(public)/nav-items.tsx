@@ -32,6 +32,7 @@ export default function NavItems({ className }: { className?: string }) {
   useEffect(() => {
     setIsAuth(Boolean(getAccessTokenFromLocalStorage()));
   }, []);
+
   return menuItems.map((item) => {
     if (
       (item.authRequired === false && isAuth) ||

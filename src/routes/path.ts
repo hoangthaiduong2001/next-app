@@ -8,6 +8,7 @@ export const pathServer = {
 };
 
 export const pathApp = {
+  home: "/",
   manage: {
     dashboard: "/manage/dashboard",
     oder: "/manage/orders",
