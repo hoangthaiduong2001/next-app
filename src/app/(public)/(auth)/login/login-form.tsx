@@ -35,7 +35,8 @@ export default function LoginForm() {
     try {
       const result = await loginMutation.mutateAsync(data);
       toast({ description: result.response.message });
-      route.push(pathApp.manage.dashboard);
+      route.push(pathApp.home);
+      route.refresh();
     } catch (error) {
       handleErrorApi({
         error,

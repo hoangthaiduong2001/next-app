@@ -7,8 +7,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ACCESS_TOKEN } from "@/constants/auth";
 import { Menu, Package2 } from "lucide-react";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import DropdownAvatar from "../manage/component/dropdown-avatar";
 import NavItems from "./nav-items";
 
 export default function Layout({
@@ -16,6 +19,9 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get(ACCESS_TOKEN)?.value || "";
+  const isAuth = Boolean(accessToken);
   return (
     <div className="flex min-h-screen w-full flex-col relative">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -26,7 +32,10 @@ export default function Layout({
           >
             <Package2 className="h-6 w-6" />
           </Link>
-          <NavItems className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0" />
+          <NavItems
+            className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0"
+            isAuth={isAuth}
+          />
         </nav>
         <Sheet>
           <SheetTrigger asChild>
@@ -48,7 +57,10 @@ export default function Layout({
                 <SheetTitle>Foodie HTD</SheetTitle>
               </Link>
               <SheetDescription className="flex flex-col text-lg gap-5">
-                <NavItems className="text-muted-foreground transition-colors hover:text-foreground" />
+                <NavItems
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  isAuth={isAuth}
+                />
               </SheetDescription>
             </nav>
           </SheetContent>
@@ -56,6 +68,7 @@ export default function Layout({
         <div className="ml-auto">
           <DarkModeToggle />
         </div>
+        {isAuth && <DropdownAvatar />}
       </header>
       <main className="flex flex-1 justify-center flex-col gap-4 p-4 md:gap-8 md:p-8">
         {children}
