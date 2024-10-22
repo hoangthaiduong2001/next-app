@@ -1,70 +1,118 @@
-import { envConfig } from "@/config/enviroment";
-
-import { normalizePath } from "@/lib/utils";
-import { pathClient, pathServer } from "@/routes/path";
+import { normalizePath } from "@/config/utils";
+import { envConfig } from "@/configTest/enviroment";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants/auth";
+import { HTTP_STATUS } from "@/constants/status";
 import { LoginResType } from "@/schemaValidations/auth.schema";
-import { CustomOptions, IPlainObject } from "@/types/common";
-import { AxiosHeaders } from "axios";
-import axiosHttp from "./axiosConfig";
-import { clearPersistToken, persistTokenAndAccount } from "./storage";
+import { EntityErrorResponse } from "@/types/error";
+import { redirect } from "next/navigation";
+import { EntityError, HttpError } from "./services";
+import { isClient } from "./storage";
 
-// let clientLogoutRequest: null | Promise<any> = null;
+type CustomOptions = Omit<RequestInit, "method"> & {
+  baseUrl?: string | undefined;
+};
 
-const isClient = typeof window !== "undefined";
-
+let clientLogoutRequest: null | Promise<any> = null;
 const request = async <Response>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
   options?: CustomOptions | undefined
 ) => {
   let body: FormData | string | undefined = undefined;
-  const baseUrl =
-    options?.baseUrl === undefined
-      ? envConfig.NEXT_PUBLIC_API_ENDPOINT
-      : options.baseUrl;
-
   if (options?.body instanceof FormData) {
     body = options.body;
   } else if (options?.body) {
     body = JSON.stringify(options.body);
   }
-
-  const baseHeaders: IPlainObject =
+  const baseHeaders: {
+    [key: string]: string;
+  } =
     body instanceof FormData
       ? {}
       : {
           "Content-Type": "application/json",
         };
-  if (!isClient && url !== pathServer.login) {
-    baseHeaders.Authorization = (
-      options?.headers as AxiosHeaders
-    ).Authorization;
-  }
-  const axiosInstance = axiosHttp({ baseURL: baseUrl, headers: baseHeaders });
-
-  const fullUrl = `${baseUrl}/${normalizePath(url)}`;
-  const res = await axiosInstance({
-    method,
-    url: fullUrl,
-    data: body,
-    headers: {
-      ...baseHeaders,
-    },
-  });
-  const responseData: Response = await res.data;
-  const data = {
-    status: res.status,
-    response: responseData,
-  };
   if (isClient) {
-    if (url === pathClient.login) {
-      const data = responseData as LoginResType;
-      persistTokenAndAccount(data);
-    } else if (url === pathClient.logout) {
-      clearPersistToken();
+    const accessToken = localStorage.getItem(ACCESS_TOKEN);
+    if (accessToken) {
+      baseHeaders.Authorization = `Bearer ${accessToken}`;
     }
   }
 
+  const baseUrl =
+    options?.baseUrl === undefined
+      ? envConfig.NEXT_PUBLIC_API_ENDPOINT
+      : options.baseUrl;
+
+  const fullUrl = `${baseUrl}/${normalizePath(url)}`;
+  const res = await fetch(fullUrl, {
+    ...options,
+    headers: {
+      ...baseHeaders,
+      ...options?.headers,
+    },
+    body,
+    method,
+  });
+  const response: Response = await res.json();
+  const data = {
+    status: res.status,
+    response,
+  };
+
+  if (!res.ok) {
+    if (res.status === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+      throw new EntityError(
+        data as {
+          status: 422;
+          response: EntityErrorResponse;
+        }
+      );
+    } else if (res.status === HTTP_STATUS.UNAUTHORIZED) {
+      if (isClient) {
+        if (!clientLogoutRequest) {
+          clientLogoutRequest = fetch("/api/auth/logout", {
+            method: "POST",
+            body: null,
+            headers: {
+              ...baseHeaders,
+            },
+          });
+          try {
+            await clientLogoutRequest;
+          } catch {
+          } finally {
+            localStorage.removeItem(ACCESS_TOKEN);
+            localStorage.removeItem(REFRESH_TOKEN);
+            clientLogoutRequest = null;
+            // Redirect về trang login có thể dẫn đến loop vô hạn
+            // Nếu không không được xử lý đúng cách
+            // Vì nếu rơi vào trường hợp tại trang Login, chúng ta có gọi các API cần access token
+            // Mà access token đã bị xóa thì nó lại nhảy vào đây, và cứ thế nó sẽ bị lặp
+            location.href = "/login";
+          }
+        }
+      } else {
+        const accessToken = (options?.headers as any)?.Authorization.split(
+          "Bearer "
+        )[1];
+        redirect(`/logout?accessToken=${accessToken}`);
+      }
+    } else {
+      throw new HttpError(data);
+    }
+  }
+  if (isClient) {
+    const normalizeUrl = normalizePath(url);
+    if (normalizeUrl === "api/auth/login") {
+      const { accessToken, refreshToken } = (response as LoginResType).data;
+      localStorage.setItem(ACCESS_TOKEN, accessToken);
+      localStorage.setItem(REFRESH_TOKEN, refreshToken);
+    } else if (normalizeUrl === "api/auth/logout") {
+      localStorage.removeItem(ACCESS_TOKEN);
+      localStorage.removeItem(REFRESH_TOKEN);
+    }
+  }
   return data;
 };
 

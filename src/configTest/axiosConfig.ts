@@ -1,5 +1,5 @@
 import { authApiRequest } from "@/apiRequest/auth";
-import { envConfig } from "@/config/enviroment";
+import { envConfig } from "@/configTest/enviroment";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants/auth";
 import { HTTP_STATUS } from "@/constants/status";
 import { RefreshTokenResType } from "@/schemaValidations/auth.schema";

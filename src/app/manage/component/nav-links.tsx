@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn } from "@/config/utils";
 import { pathApp } from "@/routes/path";
 import { Package2, Settings } from "lucide-react";
 import Link from "next/link";
