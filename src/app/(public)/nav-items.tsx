@@ -1,8 +1,6 @@
 "use client";
 
-import { getAccessTokenFromLocalStorage } from "@/config/storage";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { IMenuItem } from "./(auth)/login/type";
 
 const menuItems: IMenuItem[] = [
@@ -27,11 +25,13 @@ const menuItems: IMenuItem[] = [
   },
 ];
 
-export default function NavItems({ className }: { className?: string }) {
-  const [isAuth, setIsAuth] = useState<boolean>(false);
-  useEffect(() => {
-    setIsAuth(Boolean(getAccessTokenFromLocalStorage()));
-  }, []);
+export default function NavItems({
+  className,
+  isAuth,
+}: {
+  className?: string;
+  isAuth: boolean;
+}) {
   return menuItems.map((item) => {
     if (
       (item.authRequired === false && isAuth) ||
