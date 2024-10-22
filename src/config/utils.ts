@@ -1,4 +1,3 @@
-import { getAccessToken, getRefreshToken } from "@/config/storage";
 import { toast } from "@/hooks/use-toast";
 import { clsx, type ClassValue } from "clsx";
 import { UseFormSetError } from "react-hook-form";
@@ -37,10 +36,3 @@ export const handleErrorApi = ({
     });
   }
 };
-
-const isBrowser = typeof window !== "undefined";
-
-export const getAccessTokenFromLocalStorage = () =>
-  isBrowser ? getAccessToken() : null;
-export const getRefreshTokenFromLocalStorage = () =>
-  isBrowser ? getRefreshToken() : null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { getAccessTokenFromLocalStorage } from "@/lib/utils";
+import { getAccessTokenFromLocalStorage } from "@/config/storage";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IMenuItem } from "./(auth)/login/type";
