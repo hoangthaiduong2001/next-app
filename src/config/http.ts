@@ -72,8 +72,8 @@ const request = async <Response>(
       if (isClient) {
         if (!clientLogoutRequest) {
           clientLogoutRequest = fetch("/api/auth/logout", {
-            method: "POST",
             body: null,
+            method: "POST",
             headers: {
               ...baseHeaders,
             },

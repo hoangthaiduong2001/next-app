@@ -1,8 +1,8 @@
 import { authApiRequest } from "@/apiRequest/auth";
+import { HTTP_STATUS } from "@/constants/status";
 import { LoginBodyType } from "@/schemaValidations/auth.schema";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as LoginBodyType;
@@ -27,14 +27,11 @@ export async function POST(request: Request) {
       expires: decodeRefreshToken.exp * 1000,
     });
     return Response.json(response);
-  } catch (error: any) {
-    return NextResponse.json(
-      {
-        message: error.response.data.message,
-        error: error.response.data.errors,
-        status: error.status,
-      },
-      { status: error.status }
-    );
+  } catch  {
+    return Response.json({
+      message: "Error login in client",
+    }, {
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    });
   }
 }

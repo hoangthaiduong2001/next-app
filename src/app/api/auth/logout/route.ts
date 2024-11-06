@@ -5,23 +5,27 @@ import { cookies } from "next/headers";
 
 export async function POST() {
   const cookieStore = cookies();
-  const accessToken = cookieStore.get(ACCESS_TOKEN)?.value || "";
-  const refreshToken = cookieStore.get(REFRESH_TOKEN)?.value || "";
+  const accessToken = cookieStore.get(ACCESS_TOKEN)?.value;
+  const refreshToken = cookieStore.get(REFRESH_TOKEN)?.value;
   cookieStore.delete(ACCESS_TOKEN);
   cookieStore.delete(REFRESH_TOKEN);
+  if(!accessToken || !refreshToken){
+    return Response.json({
+      message: 'Can not receive access token or refresh token'
+    }, {
+      status: HTTP_STATUS.OK
+    })
+  }
   try {
     const result = await authApiRequest.serverLogout({
       refreshToken,
       accessToken,
     });
-    if (result.status === HTTP_STATUS.OK) {
-      cookieStore.delete(ACCESS_TOKEN);
-      cookieStore.delete(REFRESH_TOKEN);
-    }
     return Response.json(result.response);
   } catch {
     return Response.json({
       message: "Error logout in client",
+    }, {
       status: HTTP_STATUS.OK,
     });
   }

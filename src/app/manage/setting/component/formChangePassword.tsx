@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { handleErrorApi } from "@/config/utils";
+import { toast } from "@/hooks/use-toast";
+import { useChangePassword } from "@/queries/useAccount";
 import {
   ChangePasswordBody,
   ChangePasswordBodyType,
@@ -13,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 export default function ChangePasswordForm() {
+  const changePassword = useChangePassword()
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
@@ -21,12 +25,26 @@ export default function ChangePasswordForm() {
       confirmPassword: "",
     },
   });
+  const onSubmit = async (data: ChangePasswordBodyType) => {
+    if(changePassword.isPending) return
+    try {
+      const result = await changePassword.mutateAsync(data)
+      toast({description: result.response.message})
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
 
   return (
     <Form {...form}>
       <form
         noValidate
         className="grid auto-rows-max items-start gap-4 md:gap-8"
+        onSubmit={form.handleSubmit(onSubmit)}
+        onReset={() => form.reset()}
       >
         <Card className="overflow-hidden" x-chunk="dashboard-07-chunk-4">
           <CardHeader>
@@ -91,9 +109,7 @@ export default function ChangePasswordForm() {
                 )}
               />
               <div className=" items-center gap-2 md:ml-auto flex">
-                <Button variant="outline" size="sm">
-                  Hủy
-                </Button>
+                <Button size='sm' variant='outline' type="reset">Reset</Button>
                 <Button size="sm">Save</Button>
               </div>
             </div>

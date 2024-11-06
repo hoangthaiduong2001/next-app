@@ -29,7 +29,7 @@ export default function DropdownAvatar() {
       const result = await logoutMutation.mutateAsync();
       route.push("/");
       toast({ description: (result.response as MessageResType).message });
-    } catch (error) {
+    } catch {
       toast({ description: "Can not logout" });
     }
   };
