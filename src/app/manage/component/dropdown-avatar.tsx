@@ -14,7 +14,6 @@ import { toast } from "@/hooks/use-toast";
 import { useAccountProfile } from "@/queries/useAccount";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { pathApp } from "@/routes/path";
-import { MessageResType } from "@/schemaValidations/common.schema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -28,7 +27,8 @@ export default function DropdownAvatar() {
     try {
       const result = await logoutMutation.mutateAsync();
       route.push("/");
-      toast({ description: (result.response as MessageResType).message });
+      route.refresh();
+      toast({ description: result.response.message });
     } catch {
       toast({ description: "Can not logout" });
     }
@@ -67,6 +67,7 @@ export default function DropdownAvatar() {
           label="Confirm logout"
           content="Are you want logout?"
           labelSubmit="Logout"
+          type="logout"
           onSubmit={handleLogout}
         />
       </DropdownMenuContent>

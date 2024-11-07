@@ -17,11 +17,14 @@ import { pathApp } from "@/routes/path";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 import { initLoginValue } from "./const";
 
 export default function LoginForm() {
   const route = useRouter();
+  const [isHide, setIsHide] = useState<boolean>(true);
   const loginMutation = useLoginMutation();
   const loginForm = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -91,12 +94,25 @@ export default function LoginForm() {
                       <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
                       </div>
-                      <Input
-                        id="password"
-                        type="password"
-                        required
-                        {...field}
-                      />
+                      <div className="flex justify-between relative items-center">
+                        <Input
+                          id="password"
+                          type={isHide ? "password" : "text"}
+                          placeholder="•••••••"
+                          required
+                          {...field}
+                        />
+                        <span
+                          className="absolute right-3"
+                          onClick={() => setIsHide((prev) => !prev)}
+                        >
+                          {isHide ? (
+                            <FaRegEye className="cursor-pointer text-gray-500" />
+                          ) : (
+                            <FaEyeSlash className="cursor-pointer text-gray-500" />
+                          )}
+                        </span>
+                      </div>
                       <FormMessage />
                     </div>
                   </FormItem>
