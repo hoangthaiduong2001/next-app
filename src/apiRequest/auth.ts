@@ -7,7 +7,6 @@ import {
   RefreshTokenResType,
 } from "@/schemaValidations/auth.schema";
 import { MessageResType } from "@/schemaValidations/common.schema";
-import axios from "axios";
 
 export const authApiRequest = {
   serverLogin: (body: LoginBodyType) =>
@@ -25,12 +24,7 @@ export const authApiRequest = {
       }
     ),
   serverRefreshToken: (body: RefreshTokenBodyType) =>
-    axios.post<RefreshTokenResType>(
-      "http://localhost:4000/auth/refresh-token",
-      {
-        refreshToken: body.refreshToken,
-      }
-    ),
+    http.post<RefreshTokenResType>("auth/refresh-token", body),
   clientLogin: (body: LoginBodyType) =>
     http.post<LoginResType>("/api/auth/login", body, {
       baseUrl: "",
@@ -39,9 +33,8 @@ export const authApiRequest = {
     http.post<MessageResType>("/api/auth/logout", null, {
       baseUrl: "",
     }),
-  clientRefreshToken: (body: RefreshTokenBodyType) =>
-    axios.post<RefreshTokenResType>(
-      "http://localhost:3000/api/auth/refresh-token",
-      { refreshToken: body.refreshToken }
-    ),
+  clientRefreshToken: () =>
+    http.post<RefreshTokenResType>("api/auth/refresh-token", null, {
+      baseUrl: "",
+    }),
 };

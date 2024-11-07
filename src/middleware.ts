@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const privatePaths = ["/manage"];
-const unAuthPaths = ["/login"];
+const publicPaths = ["/login"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuth = Boolean(request.cookies.get("accessToken")?.value);
   if (privatePaths.some((path) => pathname.startsWith(path)) && !isAuth) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/logout", request.url));
   }
-  if (unAuthPaths.some((path) => pathname.startsWith(path)) && isAuth) {
+  if (publicPaths.some((path) => pathname.startsWith(path)) && isAuth) {
     return NextResponse.redirect(new URL("/", request.url));
   }
   return NextResponse.next();
