@@ -6,6 +6,7 @@ import {
   RefreshTokenBodyType,
   RefreshTokenResType,
 } from "@/schemaValidations/auth.schema";
+import { MessageResType } from "@/schemaValidations/common.schema";
 import axios from "axios";
 
 export const authApiRequest = {
@@ -35,7 +36,7 @@ export const authApiRequest = {
       baseUrl: "",
     }),
   clientLogout: () =>
-    http.post("/api/auth/logout", null, {
+    http.post<MessageResType>("/api/auth/logout", null, {
       baseUrl: "",
     }),
   clientRefreshToken: (body: RefreshTokenBodyType) =>

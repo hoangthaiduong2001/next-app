@@ -1,7 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { IMenuItem } from "./(auth)/login/type";
+import { IMenuItem } from "./type";
 
 const menuItems: IMenuItem[] = [
   {

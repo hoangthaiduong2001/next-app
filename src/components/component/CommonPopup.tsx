@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -16,11 +17,13 @@ const CommonPopup = ({
   content,
   labelSubmit,
   onSubmit,
+  type,
 }: {
   title: string;
   label: string;
   content: ReactNode;
   labelSubmit: string;
+  type?: string;
   onSubmit: () => void;
 }) => {
   return (
@@ -39,9 +42,16 @@ const CommonPopup = ({
           <DialogDescription>{content}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button onClick={onSubmit} className="disabled:pointer-events-none">
-            {labelSubmit}
-          </Button>
+          <DialogClose asChild>
+            <Button
+              onClick={onSubmit}
+              className={`disabled:pointer-events-none ${
+                type === "logout" && "bg-red-600 hover:bg-red-600"
+              }`}
+            >
+              {labelSubmit}
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

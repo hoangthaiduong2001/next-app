@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 export default function ChangePasswordForm() {
-  const changePassword = useChangePassword()
+  const changePassword = useChangePassword();
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
@@ -26,17 +26,17 @@ export default function ChangePasswordForm() {
     },
   });
   const onSubmit = async (data: ChangePasswordBodyType) => {
-    if(changePassword.isPending) return
+    if (changePassword.isPending) return;
     try {
-      const result = await changePassword.mutateAsync(data)
-      toast({description: result.response.message})
+      const result = await changePassword.mutateAsync(data);
+      toast({ description: result.response.message });
     } catch (error) {
       handleErrorApi({
         error,
-        setError: form.setError
-      })
+        setError: form.setError,
+      });
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -60,6 +60,7 @@ export default function ChangePasswordForm() {
                     <div className="grid gap-3">
                       <Label htmlFor="oldPassword">Current password</Label>
                       <Input
+                        autoComplete="oldPassword"
                         id="oldPassword"
                         type="password"
                         className="w-full"
@@ -78,6 +79,7 @@ export default function ChangePasswordForm() {
                     <div className="grid gap-3">
                       <Label htmlFor="password">New password</Label>
                       <Input
+                        autoComplete="password"
                         id="password"
                         type="password"
                         className="w-full"
@@ -98,6 +100,7 @@ export default function ChangePasswordForm() {
                         Confirm new password
                       </Label>
                       <Input
+                        autoComplete="confirmPassword"
                         id="confirmPassword"
                         type="password"
                         className="w-full"
@@ -109,7 +112,9 @@ export default function ChangePasswordForm() {
                 )}
               />
               <div className=" items-center gap-2 md:ml-auto flex">
-                <Button size='sm' variant='outline' type="reset">Reset</Button>
+                <Button size="sm" variant="outline" type="reset">
+                  Reset
+                </Button>
                 <Button size="sm">Save</Button>
               </div>
             </div>
