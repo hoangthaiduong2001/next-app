@@ -1,5 +1,5 @@
-import AppProvider from "@/components/app-provider";
-import { ThemeProvider } from "@/components/theme-provider";
+import AppProvider from "@/components/AppProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 

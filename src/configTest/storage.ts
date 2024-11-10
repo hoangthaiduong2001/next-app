@@ -1,5 +1,5 @@
 import { ACCESS_TOKEN, REFRESH_TOKEN, USER_INFO } from "@/constants/auth";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/useToast";
 import {
   LoginResType,
   RefreshTokenResType,

@@ -7,7 +7,7 @@ import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { handleErrorApi } from "@/config/utils";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/useToast";
 import { useAccountProfile, useUpdateAccountMe } from "@/queries/useAccount";
 import { useUploadMediaMutation } from "@/queries/useMedia";
 import {
@@ -159,7 +159,7 @@ export default function UpdateProfileForm() {
 
               <div className=" items-center gap-2 md:ml-auto flex">
                 <Button variant="outline" size="sm" type="reset">
-                  Cancel
+                  Reset
                 </Button>
                 <Button size="sm" type="submit">
                   Save
