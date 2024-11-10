@@ -1,5 +1,5 @@
-import LoginForm from "@/app/(public)/(auth)/login/login-form";
 import { Metadata } from "next";
+import LoginForm from "./formLogin";
 
 export const metadata: Metadata = {
   title: "Foodie HTD Login",

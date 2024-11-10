@@ -1,5 +1,4 @@
 "use client";
-import menuItems from "@/app/manage/component/menuItems";
 import {
   Tooltip,
   TooltipContent,
@@ -11,6 +10,7 @@ import { pathApp } from "@/routes/path";
 import { Package2, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import menuItems from "./MenuItems";
 
 export default function NavLinks() {
   const pathname = usePathname();
@@ -27,13 +27,13 @@ export default function NavLinks() {
             <span className="sr-only">Acme Inc</span>
           </Link>
 
-          {menuItems.map((Item, index) => {
-            const isActive = pathname === Item.href;
+          {menuItems.map((item, index) => {
+            const isActive = pathname === item.href;
             return (
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
                   <Link
-                    href={Item.href}
+                    href={item.href}
                     className={cn(
                       "flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8",
                       {
@@ -42,11 +42,11 @@ export default function NavLinks() {
                       }
                     )}
                   >
-                    <Item.Icon className="h-5 w-5" />
-                    <span className="sr-only">{Item.title}</span>
+                    <item.Icon className="h-5 w-5" />
+                    <span className="sr-only">{item.title}</span>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right">{Item.title}</TooltipContent>
+                <TooltipContent side="right">{item.title}</TooltipContent>
               </Tooltip>
             );
           })}

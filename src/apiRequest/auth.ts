@@ -8,7 +8,13 @@ import {
 } from "@/schemaValidations/auth.schema";
 import { MessageResType } from "@/schemaValidations/common.schema";
 
+type TRefreshTokenKey = {
+  status: number;
+  response: RefreshTokenResType;
+};
+
 export const authApiRequest = {
+  refreshTokenRequest: null as Promise<TRefreshTokenKey> | null,
   serverLogin: (body: LoginBodyType) =>
     http.post<LoginResType>("/auth/login", body),
   serverLogout: (body: LogoutBodyType & { accessToken: string }) =>
@@ -33,8 +39,19 @@ export const authApiRequest = {
     http.post<MessageResType>("/api/auth/logout", null, {
       baseUrl: "",
     }),
-  clientRefreshToken: () =>
-    http.post<RefreshTokenResType>("api/auth/refresh-token", null, {
-      baseUrl: "",
-    }),
+  async clientRefreshToken() {
+    if (this.refreshTokenRequest) {
+      return this.refreshTokenRequest;
+    }
+    this.refreshTokenRequest = http.post<RefreshTokenResType>(
+      "api/auth/refresh-token",
+      null,
+      {
+        baseUrl: "",
+      }
+    );
+    const result = await this.refreshTokenRequest;
+    this.refreshTokenRequest = null;
+    return result;
+  },
 };

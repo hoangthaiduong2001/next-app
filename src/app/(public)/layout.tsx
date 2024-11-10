@@ -1,4 +1,4 @@
-import DarkModeToggle from "@/components/dark-mode-toggle";
+import DarkModeToggle from "@/components/DarkModeToggle";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -11,8 +11,8 @@ import { ACCESS_TOKEN } from "@/constants/auth";
 import { Menu, Package2 } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import DropdownAvatar from "../manage/component/dropdown-avatar";
-import NavItems from "./nav-items";
+import DropdownAvatar from "../manage/component/DropdownAvatar";
+import NavItems from "./NavItems";
 
 export default function Layout({
   children,

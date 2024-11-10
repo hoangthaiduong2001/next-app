@@ -1,5 +1,4 @@
 "use client";
-import menuItems from "@/app/manage/component/menuItems";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,6 +11,7 @@ import { cn } from "@/config/utils";
 import { Package2, PanelLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import menuItems from "./MenuItems";
 
 export default function MobileNavLinks() {
   const pathname = usePathname();
@@ -33,12 +33,12 @@ export default function MobileNavLinks() {
             <SheetTitle>Foodie HTD</SheetTitle>
             <SheetDescription />
           </Link>
-          {menuItems.map((Item, index) => {
-            const isActive = pathname === Item.href;
+          {menuItems.map((item, index) => {
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={index}
-                href={Item.href}
+                href={item.href}
                 className={cn(
                   "flex items-center gap-4 px-2.5  hover:text-foreground",
                   {
@@ -47,8 +47,8 @@ export default function MobileNavLinks() {
                   }
                 )}
               >
-                <Item.Icon className="h-5 w-5" />
-                {Item.title}
+                <item.Icon className="h-5 w-5" />
+                {item.title}
               </Link>
             );
           })}

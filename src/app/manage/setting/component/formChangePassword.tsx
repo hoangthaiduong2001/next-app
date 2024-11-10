@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { handleErrorApi } from "@/config/utils";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/useToast";
 import { useChangePassword } from "@/queries/useAccount";
 import {
   ChangePasswordBody,

@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   if (!refreshToken) {
     return Response.json(
       {
-        message: "Can not get access token",
+        message: "Can not get refresh token",
       },
       {
         status: HTTP_STATUS.UNAUTHORIZED,
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       secure: true,
       expires: decodeAccessToken.exp * 1000,
     });
-    cookieStore.set(REFRESH_TOKEN, response.data.accessToken, {
+    cookieStore.set(REFRESH_TOKEN, response.data.refreshToken, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
@@ -42,7 +42,8 @@ export async function POST(request: Request) {
       expires: decodeRefreshToken.exp * 1000,
     });
     return Response.json(response);
-  } catch {
+  } catch (error) {
+    console.log(error);
     return Response.json(
       {
         message: "Error refresh token in client",

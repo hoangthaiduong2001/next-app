@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/useToast";
 import { useAccountProfile } from "@/queries/useAccount";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { pathApp } from "@/routes/path";
