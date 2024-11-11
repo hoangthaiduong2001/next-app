@@ -15,13 +15,23 @@ const RefreshToken = () => {
     handleCheckAndRefreshToken({
       onError: () => {
         clearInterval(interval);
+        router.push("/login");
       },
     });
-    interval = setInterval(handleCheckAndRefreshToken, TIMEOUT);
+    interval = setInterval(
+      () =>
+        handleCheckAndRefreshToken({
+          onError: () => {
+            clearInterval(interval);
+            router.push("/login");
+          },
+        }),
+      TIMEOUT
+    );
     return () => {
       clearInterval(interval);
     };
-  }, [pathname]);
+  }, [pathname, router]);
   useEffect(() => {
     router.refresh();
   }, []);

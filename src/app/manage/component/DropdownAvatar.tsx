@@ -1,4 +1,5 @@
 "use client";
+import { useAppContext } from "@/components/AppProvider";
 import CommonPopup from "@/components/component/CommonPopup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,11 +22,13 @@ export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const route = useRouter();
   const { data } = useAccountProfile();
+  const { setIsAuth } = useAppContext();
   const account = data?.response.data;
   const handleLogout = async () => {
     if (logoutMutation.isPending) return;
     try {
       const result = await logoutMutation.mutateAsync();
+      setIsAuth(false);
       route.push("/");
       route.refresh();
       toast({ description: result.response.message });

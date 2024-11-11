@@ -24,6 +24,13 @@ export const setAccessTokenToLocalStorage = (value: string) => {
   }
 };
 
+export const removeTokenFromLocalStorage = () => {
+  if (isClient) {
+    localStorage.removeItem(ACCESS_TOKEN);
+    localStorage.removeItem(REFRESH_TOKEN);
+  }
+};
+
 export const setRefreshTokenToLocalStorage = (value: string) => {
   if (isClient) {
     localStorage.setItem(REFRESH_TOKEN, value);
