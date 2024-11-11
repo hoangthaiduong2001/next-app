@@ -9,6 +9,7 @@ import { EntityError } from "./services";
 import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
+  removeTokenFromLocalStorage,
   setAccessTokenToLocalStorage,
   setRefreshTokenToLocalStorage,
 } from "./storage";
@@ -62,8 +63,11 @@ export const handleCheckAndRefreshToken = async (param?: {
     exp: number;
     iat: number;
   };
-  const now = Math.round(new Date().getTime() / 1000);
-  if (decodeRefreshToken.exp <= now) return;
+  const now = new Date().getTime() / 1000 - 1;
+  if (decodeRefreshToken.exp <= now) {
+    removeTokenFromLocalStorage();
+    return param?.onError && param.onError();
+  }
   if (
     decodeAccessToken.exp - now <
     (decodeAccessToken.exp - decodeAccessToken.iat) / 3

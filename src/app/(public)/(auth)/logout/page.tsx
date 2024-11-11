@@ -1,5 +1,6 @@
 "use client";
 
+import { useAppContext } from "@/components/AppProvider";
 import { getRefreshTokenFromLocalStorage } from "@/config/storage";
 import { REFRESH_TOKEN } from "@/constants/auth";
 import { useLogoutMutation } from "@/queries/useAuth";
@@ -9,25 +10,29 @@ import { useEffect, useRef } from "react";
 const LogoutPage = () => {
   const { mutateAsync } = useLogoutMutation();
   const router = useRouter();
+  const { setIsAuth } = useAppContext();
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get(REFRESH_TOKEN);
   const ref = useRef<any>(null);
   useEffect(() => {
     if (
-      ref.current ||
-      refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()
+      !ref.current &&
+      refreshTokenFromUrl &&
+      refreshTokenFromUrl === getRefreshTokenFromLocalStorage()
     ) {
-      return;
+      ref.current = mutateAsync;
+      mutateAsync().then(() => {
+        setTimeout(() => {
+          ref.current = null;
+        }, 1000);
+        setIsAuth(false);
+        router.push("/login");
+        router.refresh();
+      });
+    } else {
+      router.push("/");
     }
-    ref.current = mutateAsync;
-    mutateAsync().then(() => {
-      setTimeout(() => {
-        ref.current = null;
-      }, 1000);
-      router.push("/login");
-      router.refresh();
-    });
-  }, [router, mutateAsync, refreshTokenFromUrl]);
+  }, [router, mutateAsync, refreshTokenFromUrl, setIsAuth]);
   return <div>page</div>;
 };
 

@@ -18,10 +18,11 @@ const RefreshTokenPage = () => {
     ) {
       handleCheckAndRefreshToken({
         onSuccess: () => {
-          console.log("redirectPathname", redirectPathname);
           router.push(redirectPathname || "/");
         },
       });
+    } else {
+      router.push("/");
     }
   }, [router, refreshTokenFromUrl, redirectPathname]);
   return <div>page</div>;

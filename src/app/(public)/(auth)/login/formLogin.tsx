@@ -1,4 +1,5 @@
 "use client";
+import { useAppContext } from "@/components/AppProvider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,14 +17,17 @@ import { useLoginMutation } from "@/queries/useAuth";
 import { pathApp } from "@/routes/path";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 import { initLoginValue } from "./const";
 
 export default function LoginForm() {
   const route = useRouter();
+  const searchParams = useSearchParams();
+  const { setIsAuth } = useAppContext();
+  const clearTokens = searchParams.get("clearTokens");
   const [isHide, setIsHide] = useState<boolean>(true);
   const loginMutation = useLoginMutation();
   const loginForm = useForm<LoginBodyType>({
@@ -38,6 +42,7 @@ export default function LoginForm() {
     try {
       const result = await loginMutation.mutateAsync(data);
       toast({ description: result.response.message });
+      setIsAuth(true);
       route.push(pathApp.home);
       route.refresh();
     } catch (error) {
@@ -47,6 +52,12 @@ export default function LoginForm() {
       });
     }
   };
+
+  useEffect(() => {
+    if (clearTokens) {
+      setIsAuth(false);
+    }
+  }, [clearTokens, setIsAuth]);
 
   return (
     <Card className="mx-auto max-w-sm">

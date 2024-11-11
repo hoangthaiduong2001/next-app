@@ -33,10 +33,7 @@ export default function Layout({
           >
             <Package2 className="h-6 w-6" />
           </Link>
-          <NavItems
-            className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0"
-            isAuth={isAuth}
-          />
+          <NavItems className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0" />
         </nav>
         <Sheet>
           <SheetTrigger asChild>
@@ -58,10 +55,7 @@ export default function Layout({
                 <SheetTitle>Foodie HTD</SheetTitle>
               </Link>
               <SheetDescription className="flex flex-col text-lg gap-5">
-                <NavItems
-                  className="text-muted-foreground transition-colors hover:text-foreground"
-                  isAuth={isAuth}
-                />
+                <NavItems className="text-muted-foreground transition-colors hover:text-foreground" />
               </SheetDescription>
             </nav>
           </SheetContent>
