@@ -15,7 +15,7 @@ export const pathApp = {
     table: "/manage/tables",
     dish: "/manage/dishes",
     analytic: "/manage/analytics",
-    staff: "/manage/staffs",
+    accounts: "/manage/accounts",
     setting: "/manage/setting",
   },
 };
