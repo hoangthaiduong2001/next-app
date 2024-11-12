@@ -1,4 +1,3 @@
-import { authApiRequest } from "@/apiRequest/auth";
 import { envConfig } from "@/configTest/enviroment";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants/auth";
 import { HTTP_STATUS } from "@/constants/status";
@@ -66,14 +65,14 @@ const axiosHttp = ({
           refreshToken = cookieStore.get("refreshToken")?.value || "";
         }
 
-        if (!refreshTokenPromise) {
-          refreshTokenPromise = authApiRequest
-            .clientRefreshToken({
-              refreshToken,
-            })
-            .then((response) => response.data)
-            .finally(clearPromise);
-        }
+        // if (!refreshTokenPromise) {
+        //   refreshTokenPromise = authApiRequest
+        //     .clientRefreshToken({
+        //       refreshToken,
+        //     })
+        //     .then((response) => response.data)
+        //     .finally(clearPromise);
+        // }
 
         const result = await refreshTokenPromise;
         if (result) {

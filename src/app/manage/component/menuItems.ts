@@ -36,9 +36,9 @@ const menuItems = [
     href: pathApp.manage.analytic,
   },
   {
-    title: "Staff",
+    title: "Accounts",
     Icon: Users2,
-    href: pathApp.manage.staff,
+    href: pathApp.manage.accounts,
   },
 ];
 
