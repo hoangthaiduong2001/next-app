@@ -89,7 +89,7 @@ export const columns: ColumnDef<AccountType>[] = [
   },
   {
     accessorKey: "name",
-    header: "Tên",
+    header: "Name",
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
@@ -311,9 +311,8 @@ export default function AccountTable() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị{" "}
-            <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-            <strong>{data.length}</strong> kết quả
+            Display <strong>{table.getPaginationRowModel().rows.length}</strong>{" "}
+            in <strong>{data.length}</strong> Result
           </div>
           <div>
             <AutoPagination

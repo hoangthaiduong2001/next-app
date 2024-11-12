@@ -12,8 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/useToast";
-import { useAccountProfile } from "@/queries/useAccount";
 import { useLogoutMutation } from "@/queries/useAuth";
+import { useGetProfileMe } from "@/queries/useMe";
 import { pathApp } from "@/routes/path";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const route = useRouter();
-  const { data } = useAccountProfile();
+  const { data } = useGetProfileMe();
   const { setIsAuth } = useAppContext();
   const account = data?.response.data;
   const handleLogout = async () => {

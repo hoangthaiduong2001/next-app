@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { handleErrorApi } from "@/config/utils";
 import { toast } from "@/hooks/useToast";
-import { useAccountProfile, useUpdateAccountMe } from "@/queries/useAccount";
+import { useGetProfileMe, useUpdateMe } from "@/queries/useMe";
 import { useUploadMediaMutation } from "@/queries/useMedia";
 import {
   UpdateMeBody,
@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 export default function UpdateProfileForm() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
-  const updateMeMutation = useUpdateAccountMe();
+  const updateMeMutation = useUpdateMe();
   const uploadMediaMutation = useUploadMediaMutation();
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
@@ -31,7 +31,7 @@ export default function UpdateProfileForm() {
       avatar: undefined,
     },
   });
-  const { data, refetch } = useAccountProfile();
+  const { data, refetch } = useGetProfileMe();
   const avatar = form.watch("avatar");
   const nameAccount = form.watch("name");
   const changeAvatar = useMemo(() => {
