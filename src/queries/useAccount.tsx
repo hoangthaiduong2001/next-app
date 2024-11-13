@@ -13,6 +13,7 @@ export const useGetAccountById = ({ id }: { id: number }) => {
   return useQuery({
     queryKey: ["accounts", id],
     queryFn: () => accountApiRequest.getAccountById(id),
+    enabled: !!id,
   });
 };
 
@@ -39,6 +40,7 @@ export const useUpdateAccount = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["accounts"],
+        exact: true,
       });
     },
   });
