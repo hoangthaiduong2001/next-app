@@ -13,46 +13,92 @@ import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { handleErrorApi } from "@/config/utils";
+import { toast } from "@/hooks/useToast";
+import { useGetAccountById, useUpdateAccount } from "@/queries/useAccount";
+import { useUploadMediaMutation } from "@/queries/useMedia";
 import {
   UpdateEmployeeAccountBody,
   UpdateEmployeeAccountBodyType,
 } from "@/schemaValidations/account.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { defaultValueEditAccount } from "./const";
+import { EditEmployeeType } from "./type";
 
 export default function EditEmployee({
   id,
   setId,
   onSubmitSuccess,
-}: {
-  id?: number | undefined;
-  setId: (value: number | undefined) => void;
-  onSubmitSuccess?: () => void;
-}) {
+}: EditEmployeeType) {
   const [file, setFile] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const { data } = useGetAccountById({
+    id: Number(id),
+  });
+  const updateAccount = useUpdateAccount();
+  const uploadMediaMutation = useUploadMediaMutation();
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
-    defaultValues: {
-      name: "",
-      email: "",
-      avatar: undefined,
-      password: undefined,
-      confirmPassword: undefined,
-      changePassword: false,
-    },
+    defaultValues: defaultValueEditAccount,
   });
-  const avatar = form.watch("avatar");
-  const name = form.watch("name");
-  const changePassword = form.watch("changePassword");
+  const { name, avatar, changePassword, password, confirmPassword } =
+    form.getValues();
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file);
     }
     return avatar;
   }, [file, avatar]);
+
+  useEffect(() => {
+    if (data) {
+      const { name, avatar, email } = data.response.data;
+      form.reset({
+        name,
+        avatar: avatar ?? undefined,
+        email,
+        changePassword,
+        password,
+        confirmPassword,
+      });
+    }
+  }, [data, form]);
+
+  const onSubmit = async (value: UpdateEmployeeAccountBodyType) => {
+    if (updateAccount.isPending) return;
+    try {
+      let body: UpdateEmployeeAccountBodyType & { id: number } = {
+        id: Number(id),
+        ...value,
+      };
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadImageResult = await uploadMediaMutation.mutateAsync(
+          formData
+        );
+        const imageUrl = uploadImageResult.response.data;
+        body = {
+          ...body,
+          avatar: imageUrl,
+        };
+      }
+      const result = await updateAccount.mutateAsync(body);
+      toast({
+        description: (result.response as any).message,
+      });
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      onSubmitSuccess && onSubmitSuccess();
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+    }
+  };
 
   return (
     <Dialog
@@ -65,9 +111,9 @@ export default function EditEmployee({
     >
       <DialogContent className="sm:max-w-[600px] max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Cập nhật tài khoản</DialogTitle>
+          <DialogTitle>Update account</DialogTitle>
           <DialogDescription>
-            Các trường tên, email, mật khẩu là bắt buộc
+            Field name, email, password is required
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -75,6 +121,7 @@ export default function EditEmployee({
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="edit-employee-form"
+            onSubmit={form.handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormField
@@ -123,7 +170,7 @@ export default function EditEmployee({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Tên</Label>
+                      <Label htmlFor="name">Name</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="name" className="w-full" {...field} />
                         <FormMessage />
@@ -153,7 +200,7 @@ export default function EditEmployee({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="email">Đổi mật khẩu</Label>
+                      <Label htmlFor="email">Change password</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Switch
                           checked={field.value}
@@ -172,7 +219,7 @@ export default function EditEmployee({
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="password">Mật khẩu mới</Label>
+                        <Label htmlFor="password">New password</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input
                             id="password"
@@ -195,7 +242,7 @@ export default function EditEmployee({
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                         <Label htmlFor="confirmPassword">
-                          Xác nhận mật khẩu mới
+                          Confirm new password
                         </Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input
@@ -216,7 +263,7 @@ export default function EditEmployee({
         </Form>
         <DialogFooter>
           <Button type="submit" form="edit-employee-form">
-            Lưu
+            Save
           </Button>
         </DialogFooter>
       </DialogContent>

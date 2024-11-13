@@ -47,14 +47,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  AccountListResType,
-  AccountType,
-} from "@/schemaValidations/account.schema";
+import { useGetListAccount } from "@/queries/useAccount";
+import { AccountType } from "@/schemaValidations/account.schema";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
-
-type AccountItem = AccountListResType["data"][0];
+import { PAGE_SIZE } from "./const";
+import { AccountItem } from "./type";
 
 const AccountTableContext = createContext<{
   setEmployeeIdEdit: (value: number) => void;
@@ -89,7 +87,7 @@ export const columns: ColumnDef<AccountType>[] = [
   },
   {
     accessorKey: "name",
-    header: "Tên",
+    header: "Name",
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
@@ -105,7 +103,7 @@ export const columns: ColumnDef<AccountType>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => <div>{row.getValue("email")}</div>,
   },
   {
     id: "actions",
@@ -131,9 +129,11 @@ export const columns: ColumnDef<AccountType>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={openEditEmployee}>Sửa</DropdownMenuItem>
+            <DropdownMenuItem onClick={openEditEmployee}>
+              Update
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={openDeleteEmployee}>
-              Xóa
+              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -160,13 +160,13 @@ function AlertDialogDeleteAccount({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa nhân viên?</AlertDialogTitle>
+          <AlertDialogTitle>Delete employee?</AlertDialogTitle>
           <AlertDialogDescription>
-            Tài khoản{" "}
+            Account{" "}
             <span className="bg-foreground text-primary-foreground rounded px-1">
               {employeeDelete?.name}
             </span>{" "}
-            sẽ bị xóa vĩnh viễn
+            will be permanently deleted
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -178,7 +178,6 @@ function AlertDialogDeleteAccount({
   );
 }
 // Số lượng item trên 1 trang
-const PAGE_SIZE = 10;
 export default function AccountTable() {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
@@ -188,7 +187,8 @@ export default function AccountTable() {
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(
     null
   );
-  const data: any[] = [];
+  const accountList = useGetListAccount();
+  const data = accountList.data?.response.data ?? [];
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -311,9 +311,8 @@ export default function AccountTable() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị{" "}
-            <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-            <strong>{data.length}</strong> kết quả
+            Display <strong>{table.getPaginationRowModel().rows.length}</strong>{" "}
+            in <strong>{data.length}</strong> Result
           </div>
           <div>
             <AutoPagination

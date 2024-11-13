@@ -1,14 +1,21 @@
 import http from "@/config/http";
 import {
+  AccountListResType,
   AccountResType,
-  ChangePasswordBodyType,
-  UpdateMeBodyType,
+  CreateEmployeeAccountBodyType,
+  UpdateEmployeeAccountBodyType,
 } from "@/schemaValidations/account.schema";
 
 const accountApiRequest = {
-  getAccount: () => http.get<AccountResType>("/accounts/me"),
-  updateAccount: (body: UpdateMeBodyType) => http.put<AccountResType>("/accounts/me", body),
-  changePassword: (body: ChangePasswordBodyType) => http.put<AccountResType>('accounts/change-password', body)
+  getListAccount: () => http.get<AccountListResType>("/accounts"),
+  addAccount: (body: CreateEmployeeAccountBodyType) =>
+    http.post<AccountResType>("/accounts", body),
+  updateAccount: (id: number, body: UpdateEmployeeAccountBodyType) =>
+    http.put(`/accounts/detail/${id}`, body),
+  getAccountById: (id: number) =>
+    http.get<AccountResType>(`/accounts/detail/${id}`),
+  deleteAccount: (id: number) =>
+    http.delete<AccountResType>(`/accounts/detail/${id}`),
 };
 
 export default accountApiRequest;

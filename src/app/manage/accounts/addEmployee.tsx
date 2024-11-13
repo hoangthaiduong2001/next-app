@@ -1,5 +1,6 @@
-'use client'
-import { Button } from '@/components/ui/button'
+"use client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,87 +8,137 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { CreateEmployeeAccountBody, CreateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { PlusCircle, Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { handleErrorApi } from "@/config/utils";
+import { toast } from "@/hooks/useToast";
+import { useAddAccount } from "@/queries/useAccount";
+import { useUploadMediaMutation } from "@/queries/useMedia";
+import {
+  CreateEmployeeAccountBody,
+  CreateEmployeeAccountBodyType,
+} from "@/schemaValidations/account.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PlusCircle, Upload } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { defaultValueAddAccount } from "./const";
 
 export default function AddEmployee() {
-  const [file, setFile] = useState<File | null>(null)
-  const [open, setOpen] = useState(false)
-  const avatarInputRef = useRef<HTMLInputElement | null>(null)
+  const [file, setFile] = useState<File | null>(null);
+  const [open, setOpen] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const uploadMediaMutation = useUploadMediaMutation();
+  const addAccount = useAddAccount();
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
-    defaultValues: {
-      name: '',
-      email: '',
-      avatar: undefined,
-      password: '',
-      confirmPassword: ''
-    }
-  })
-  const avatar = form.watch('avatar')
-  const name = form.watch('name')
+    defaultValues: defaultValueAddAccount,
+  });
+  const { name, avatar } = form.getValues();
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
-      return URL.createObjectURL(file)
+      return URL.createObjectURL(file);
     }
-    return avatar
-  }, [file, avatar])
+    return avatar;
+  }, [file, avatar]);
+
+  const reset = () => {
+    form.reset();
+    setFile(null);
+  };
+
+  const onSubmit = async (value: CreateEmployeeAccountBodyType) => {
+    if (addAccount.isPending) return;
+    try {
+      let body = value;
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadImageResult = await uploadMediaMutation.mutateAsync(
+          formData
+        );
+        const imageUrl = uploadImageResult.response.data;
+        body = {
+          ...value,
+          avatar: imageUrl,
+        };
+      }
+      const result = await addAccount.mutateAsync(body);
+      toast({
+        description: result.response.message,
+      });
+      setOpen(false);
+      reset();
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+    }
+  };
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button size='sm' className='h-7 gap-1'>
-          <PlusCircle className='h-3.5 w-3.5' />
-          <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>Tạo tài khoản</span>
+        <Button size="sm" className="h-7 gap-1">
+          <PlusCircle className="h-3.5 w-3.5" />
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+            Create account
+          </span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className="sm:max-w-[600px] max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Tạo tài khoản</DialogTitle>
-          <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
+          <DialogTitle>Create account</DialogTitle>
+          <DialogDescription>
+            Field name, email, password is required
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
-            <div className='grid gap-4 py-4'>
+          <form
+            noValidate
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="add-employee-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}
-                name='avatar'
+                name="avatar"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='flex gap-2 items-start justify-start'>
-                      <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
+                    <div className="flex gap-2 items-start justify-start">
+                      <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
                         <AvatarImage src={previewAvatarFromFile} />
-                        <AvatarFallback className='rounded-none'>{name || 'Avatar'}</AvatarFallback>
+                        <AvatarFallback className="rounded-none">
+                          {name || "Avatar"}
+                        </AvatarFallback>
                       </Avatar>
                       <input
-                        type='file'
-                        accept='image/*'
+                        type="file"
+                        accept="image/*"
                         ref={avatarInputRef}
                         onChange={(e) => {
-                          const file = e.target.files?.[0]
+                          const file = e.target.files?.[0];
                           if (file) {
-                            setFile(file)
-                            field.onChange('http://localhost:3000/' + file.name)
+                            setFile(file);
+                            field.onChange(
+                              "http://localhost:3000/" + file.name
+                            );
                           }
                         }}
-                        className='hidden'
+                        className="hidden"
                       />
                       <button
-                        className='flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed'
-                        type='button'
+                        className="flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed"
+                        type="button"
                         onClick={() => avatarInputRef.current?.click()}
                       >
-                        <Upload className='h-4 w-4 text-muted-foreground' />
-                        <span className='sr-only'>Upload</span>
+                        <Upload className="h-4 w-4 text-muted-foreground" />
+                        <span className="sr-only">Upload</span>
                       </button>
                     </div>
                   </FormItem>
@@ -96,13 +147,13 @@ export default function AddEmployee() {
 
               <FormField
                 control={form.control}
-                name='name'
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
-                      <Label htmlFor='name'>Tên</Label>
-                      <div className='col-span-3 w-full space-y-2'>
-                        <Input id='name' className='w-full' {...field} />
+                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                      <Label htmlFor="name">Name</Label>
+                      <div className="col-span-3 w-full space-y-2">
+                        <Input id="name" className="w-full" {...field} />
                         <FormMessage />
                       </div>
                     </div>
@@ -111,13 +162,13 @@ export default function AddEmployee() {
               />
               <FormField
                 control={form.control}
-                name='email'
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
-                      <Label htmlFor='email'>Email</Label>
-                      <div className='col-span-3 w-full space-y-2'>
-                        <Input id='email' className='w-full' {...field} />
+                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                      <Label htmlFor="email">Email</Label>
+                      <div className="col-span-3 w-full space-y-2">
+                        <Input id="email" className="w-full" {...field} />
                         <FormMessage />
                       </div>
                     </div>
@@ -126,13 +177,18 @@ export default function AddEmployee() {
               />
               <FormField
                 control={form.control}
-                name='password'
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
-                      <Label htmlFor='password'>Mật khẩu</Label>
-                      <div className='col-span-3 w-full space-y-2'>
-                        <Input id='password' className='w-full' type='password' {...field} />
+                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                      <Label htmlFor="password">Password</Label>
+                      <div className="col-span-3 w-full space-y-2">
+                        <Input
+                          id="password"
+                          className="w-full"
+                          type="password"
+                          {...field}
+                        />
                         <FormMessage />
                       </div>
                     </div>
@@ -141,13 +197,18 @@ export default function AddEmployee() {
               />
               <FormField
                 control={form.control}
-                name='confirmPassword'
+                name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
-                      <Label htmlFor='confirmPassword'>Xác nhận mật khẩu</Label>
-                      <div className='col-span-3 w-full space-y-2'>
-                        <Input id='confirmPassword' className='w-full' type='password' {...field} />
+                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                      <Label htmlFor="confirmPassword">Confirm password</Label>
+                      <div className="col-span-3 w-full space-y-2">
+                        <Input
+                          id="confirmPassword"
+                          className="w-full"
+                          type="password"
+                          {...field}
+                        />
                         <FormMessage />
                       </div>
                     </div>
@@ -158,11 +219,11 @@ export default function AddEmployee() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type='submit' form='add-employee-form'>
-            Thêm
+          <Button type="submit" form="add-employee-form">
+            Add
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

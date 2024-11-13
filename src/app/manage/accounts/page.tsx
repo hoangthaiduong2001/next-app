@@ -1,3 +1,4 @@
+import AccountTable from "@/app/manage/accounts/accountTable";
 import {
   Card,
   CardContent,
@@ -5,8 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-import AccountTable from "@/app/manage/accounts/accountTable";
 import { Suspense } from "react";
 
 export default function Dashboard() {
@@ -15,8 +14,8 @@ export default function Dashboard() {
       <div className="space-y-2">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
-            <CardTitle>Tài khoản</CardTitle>
-            <CardDescription>Quản lý tài khoản nhân viên</CardDescription>
+            <CardTitle>Account</CardTitle>
+            <CardDescription>Management account employee</CardDescription>
           </CardHeader>
           <CardContent>
             <Suspense>
