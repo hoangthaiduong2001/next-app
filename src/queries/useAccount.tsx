@@ -46,10 +46,10 @@ export const useUpdateAccount = () => {
   });
 };
 
-export const useDeleteAccount = ({ id }: { id: number }) => {
+export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => accountApiRequest.deleteAccount(id),
+    mutationFn: accountApiRequest.deleteAccount,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["accounts"],

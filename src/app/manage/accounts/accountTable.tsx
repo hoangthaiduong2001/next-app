@@ -16,8 +16,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import AddEmployee from "@/app/manage/accounts/addEmployee";
-import EditEmployee from "@/app/manage/accounts/editEmployee";
+import AddEmployee from "@/app/manage/accounts/addAccount";
+import EditEmployee from "@/app/manage/accounts/editAccount";
 import AutoPagination from "@/components/component/autoPagination";
 import {
   AlertDialog,
@@ -47,7 +47,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetListAccount } from "@/queries/useAccount";
+import { handleErrorApi } from "@/config/utils";
+import { toast } from "@/hooks/useToast";
+import { useDeleteAccount, useGetListAccount } from "@/queries/useAccount";
 import { AccountType } from "@/schemaValidations/account.schema";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -149,6 +151,22 @@ function AlertDialogDeleteAccount({
   employeeDelete: AccountItem | null;
   setEmployeeDelete: (value: AccountItem | null) => void;
 }) {
+  const { mutateAsync } = useDeleteAccount();
+  const deleteAccount = async () => {
+    if (employeeDelete) {
+      try {
+        const result = await mutateAsync(employeeDelete.id);
+        setEmployeeDelete(null);
+        toast({
+          title: result.response.message,
+        });
+      } catch (error) {
+        handleErrorApi({
+          error,
+        });
+      }
+    }
+  };
   return (
     <AlertDialog
       open={Boolean(employeeDelete)}
@@ -171,7 +189,7 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={deleteAccount}>Delete</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
