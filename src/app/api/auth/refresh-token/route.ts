@@ -42,8 +42,9 @@ export async function POST(request: Request) {
       expires: decodeRefreshToken.exp * 1000,
     });
     return Response.json(response);
-  } catch (error) {
-    console.log(error);
+  } catch {
+    cookieStore.delete(ACCESS_TOKEN);
+    cookieStore.delete(REFRESH_TOKEN);
     return Response.json(
       {
         message: "Error refresh token in client",

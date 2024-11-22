@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { authApiRequest } from "@/apiRequest/auth";
+import { DishStatus } from "@/constants/type";
 import { toast } from "@/hooks/useToast";
 import { clsx, type ClassValue } from "clsx";
 import jwt from "jsonwebtoken";
@@ -81,4 +82,24 @@ export const handleCheckAndRefreshToken = async (param?: {
       param?.onError && param.onError();
     }
   }
+};
+
+export const getVietnameseDishStatus = (
+  status: (typeof DishStatus)[keyof typeof DishStatus]
+) => {
+  switch (status) {
+    case DishStatus.Available:
+      return "Available";
+    case DishStatus.Unavailable:
+      return "Unavailable";
+    default:
+      return "Hide";
+  }
+};
+
+export const formatCurrency = (number: number) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(number);
 };

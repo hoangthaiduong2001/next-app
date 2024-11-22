@@ -1,6 +1,5 @@
 "use client";
 
-import { useAppContext } from "@/components/AppProvider";
 import Link from "next/link";
 import { IMenuItem } from "./type";
 
@@ -26,8 +25,13 @@ const menuItems: IMenuItem[] = [
   },
 ];
 
-export default function NavItems({ className }: { className?: string }) {
-  const { isAuth } = useAppContext();
+export default function NavItems({
+  className,
+  isAuth,
+}: {
+  className?: string;
+  isAuth?: boolean;
+}) {
   return menuItems.map((item) => {
     if (
       (item.authRequired === false && isAuth) ||
