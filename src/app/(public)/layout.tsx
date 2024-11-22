@@ -33,7 +33,10 @@ export default function Layout({
           >
             <Package2 className="h-6 w-6" />
           </Link>
-          <NavItems className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0" />
+          <NavItems
+            isAuth={isAuth}
+            className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0"
+          />
         </nav>
         <Sheet>
           <SheetTrigger asChild>
