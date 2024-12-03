@@ -46,10 +46,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatCurrency, getVietnameseDishStatus } from "@/config/utils";
+import {
+  formatCurrency,
+  getVietnameseDishStatus,
+  handleErrorApi,
+} from "@/config/utils";
+import { toast } from "@/hooks/useToast";
+import { useDeleteDish, useGetListDish } from "@/queries/useDish";
 import { DishListResType } from "@/schemaValidations/dish.schema";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
+import { PAGE_SIZE } from "./const";
 
 type DishItem = DishListResType["data"][0];
 
@@ -69,13 +76,16 @@ export const columns: ColumnDef<DishItem>[] = [
   {
     accessorKey: "id",
     header: "ID",
+    cell: ({ row }) => (
+      <div className="capitalize text-center">{row.getValue("id")}</div>
+    ),
   },
   {
     accessorKey: "image",
     header: "Image",
     cell: ({ row }) => (
-      <div>
-        <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
+      <div className="flex justify-center">
+        <Avatar className="aspect-square text-center w-[100px] h-[100px] rounded-md object-cover">
           <AvatarImage src={row.getValue("image")} />
           <AvatarFallback className="rounded-none">
             {row.original.name}
@@ -87,13 +97,17 @@ export const columns: ColumnDef<DishItem>[] = [
   {
     accessorKey: "name",
     header: "Name",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize text-center">{row.getValue("name")}</div>
+    ),
   },
   {
     accessorKey: "price",
     header: "Price",
     cell: ({ row }) => (
-      <div className="capitalize">{formatCurrency(row.getValue("price"))}</div>
+      <div className="capitalize text-center">
+        {formatCurrency(row.getValue("price"))}
+      </div>
     ),
   },
   {
@@ -102,7 +116,7 @@ export const columns: ColumnDef<DishItem>[] = [
     cell: ({ row }) => (
       <div
         dangerouslySetInnerHTML={{ __html: row.getValue("description") }}
-        className="whitespace-pre-line"
+        className="whitespace-pre-line text-center"
       />
     ),
   },
@@ -110,7 +124,9 @@ export const columns: ColumnDef<DishItem>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div>{getVietnameseDishStatus(row.getValue("status"))}</div>
+      <div className="text-center">
+        {getVietnameseDishStatus(row.getValue("status"))}
+      </div>
     ),
   },
   {
@@ -152,6 +168,20 @@ function AlertDialogDeleteDish({
   dishDelete: DishItem | null;
   setDishDelete: (value: DishItem | null) => void;
 }) {
+  const { mutateAsync } = useDeleteDish();
+  const deleteDish = async () => {
+    if (dishDelete) {
+      try {
+        const result = await mutateAsync(dishDelete.id);
+        setDishDelete(null);
+        toast({
+          title: result.response.message,
+        });
+      } catch (error) {
+        handleErrorApi({ error });
+      }
+    }
+  };
   return (
     <AlertDialog
       open={Boolean(dishDelete)}
@@ -165,7 +195,7 @@ function AlertDialogDeleteDish({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete dish?</AlertDialogTitle>
           <AlertDialogDescription>
-            Món{" "}
+            Dish{" "}
             <span className="bg-foreground text-primary-foreground rounded px-1">
               {dishDelete?.name}
             </span>{" "}
@@ -174,27 +204,27 @@ function AlertDialogDeleteDish({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={deleteDish}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
-// Số lượng item trên 1 trang
-const PAGE_SIZE = 10;
+
 export default function DishTable() {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
   const pageIndex = page - 1;
+  const dishList = useGetListDish();
+  const data = dishList.data?.response.data || [];
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>();
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null);
-  const data: any[] = [];
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({
-    pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
+    pageIndex, // Giá trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, //default page size
   });
 
@@ -241,8 +271,8 @@ export default function DishTable() {
           <Input
             placeholder="Filter name"
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
+            onChange={(e) =>
+              table.getColumn("name")?.setFilterValue(e.target.value)
             }
             className="max-w-sm"
           />

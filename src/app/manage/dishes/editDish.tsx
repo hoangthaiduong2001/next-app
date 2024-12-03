@@ -26,16 +26,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { getVietnameseDishStatus } from "@/config/utils";
-import { DishStatus, DishStatusValues } from "@/constants/type";
+import { getVietnameseDishStatus, handleErrorApi } from "@/config/utils";
+import { DishStatusValues } from "@/constants/type";
+import { toast } from "@/hooks/useToast";
+import { useGetDishById, useUpdateDish } from "@/queries/useDish";
+import { useUploadMediaMutation } from "@/queries/useMedia";
 import {
   UpdateDishBody,
   UpdateDishBodyType,
 } from "@/schemaValidations/dish.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { defaultValueFormDish } from "./const";
 
 export default function EditDish({
   id,
@@ -50,22 +54,61 @@ export default function EditDish({
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const form = useForm<UpdateDishBodyType>({
     resolver: zodResolver(UpdateDishBody),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      image: "",
-      status: DishStatus.Unavailable,
-    },
+    defaultValues: defaultValueFormDish,
   });
-  const image = form.watch("image");
-  const name = form.watch("name");
+  const { data } = useGetDishById({ id: Number(id) });
+  const updateDish = useUpdateDish();
+  const uploadMediaMutation = useUploadMediaMutation();
+  const { image, name } = form.watch();
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file);
     }
     return image;
   }, [file, image]);
+  const onSubmit = async (value: UpdateDishBodyType) => {
+    if (updateDish.isPending) return;
+    try {
+      let body: UpdateDishBodyType & { id: number } = {
+        ...value,
+        id: Number(id),
+      };
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const updateImageResult = await uploadMediaMutation.mutateAsync(
+          formData
+        );
+        const imageUrl = await updateImageResult.response.data;
+        body = {
+          ...body,
+          image: imageUrl,
+        };
+      }
+      const result = await updateDish.mutateAsync(body);
+      onSubmitSuccess && onSubmitSuccess();
+      toast({
+        description: result.response.message,
+      });
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+    }
+  };
+  useEffect(() => {
+    if (data) {
+      const { image, name, description, price, status } = data.response.data;
+      form.reset({
+        name,
+        image: image ?? undefined,
+        description,
+        price,
+        status,
+      });
+    }
+  }, [data, form]);
   return (
     <Dialog
       open={Boolean(id)}
@@ -85,6 +128,7 @@ export default function EditDish({
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="edit-dish-form"
+            onSubmit={form.handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormField
@@ -151,10 +195,19 @@ export default function EditDish({
                       <Label htmlFor="price">Price</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input
+                          {...field}
                           id="price"
                           className="w-full"
-                          {...field}
-                          type="number"
+                          type="text"
+                          onChange={(e) => {
+                            if (
+                              (Number(e.target.value) > 0 &&
+                                typeof Number(e.target.value) === "number") ||
+                              e.target.value === ""
+                            ) {
+                              field.onChange(e.target.value);
+                            }
+                          }}
                         />
                         <FormMessage />
                       </div>

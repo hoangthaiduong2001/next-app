@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ACCESS_TOKEN } from "@/constants/auth";
+import { REFRESH_TOKEN } from "@/constants/auth";
 import { Menu, Package2 } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -20,8 +20,8 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   const cookieStore = cookies();
-  const accessToken = cookieStore.get(ACCESS_TOKEN)?.value;
-  const isAuth = Boolean(accessToken);
+  const refreshToken = cookieStore.get(REFRESH_TOKEN)?.value;
+  const isAuth = Boolean(refreshToken);
   console.log("isAuth", isAuth);
   return (
     <div className="flex min-h-screen w-full flex-col relative">
