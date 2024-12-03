@@ -53,20 +53,6 @@ export default function EditEmployee({
     return avatar;
   }, [file, avatar]);
 
-  useEffect(() => {
-    if (data) {
-      const { name, avatar, email } = data.response.data;
-      form.reset({
-        name,
-        avatar: avatar ?? undefined,
-        email,
-        changePassword,
-        password,
-        confirmPassword,
-      });
-    }
-  }, [data, form]);
-
   const onSubmit = async (value: UpdateEmployeeAccountBodyType) => {
     if (updateAccount.isPending) return;
     try {
@@ -90,7 +76,6 @@ export default function EditEmployee({
       toast({
         description: (result.response as any).message,
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       onSubmitSuccess && onSubmitSuccess();
     } catch (error) {
       handleErrorApi({
@@ -99,6 +84,20 @@ export default function EditEmployee({
       });
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      const { name, avatar, email } = data.response.data;
+      form.reset({
+        name,
+        avatar: avatar ?? undefined,
+        email,
+        changePassword,
+        password,
+        confirmPassword,
+      });
+    }
+  }, [data, form]);
 
   return (
     <Dialog

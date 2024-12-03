@@ -6,7 +6,7 @@ import { IMenuItem } from "./type";
 const menuItems: IMenuItem[] = [
   {
     title: "Dish",
-    href: "/menu",
+    href: "/manage/dishes",
   },
   {
     title: "Order",
