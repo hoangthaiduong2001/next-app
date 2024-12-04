@@ -72,12 +72,15 @@ export const columns: ColumnDef<AccountType>[] = [
   {
     accessorKey: "id",
     header: "ID",
+    cell: ({ row }) => (
+      <div className="capitalize text-center">{row.getValue("id")}</div>
+    ),
   },
   {
     accessorKey: "avatar",
     header: "Avatar",
     cell: ({ row }) => (
-      <div>
+      <div className="flex justify-center">
         <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
           <AvatarImage src={row.getValue("avatar")} />
           <AvatarFallback className="rounded-none">
@@ -90,7 +93,16 @@ export const columns: ColumnDef<AccountType>[] = [
   {
     accessorKey: "name",
     header: "Name",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize text-center">{row.getValue("name")}</div>
+    ),
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => (
+      <div className="capitalize text-center">{row.getValue("role")}</div>
+    ),
   },
   {
     accessorKey: "email",
@@ -105,7 +117,9 @@ export const columns: ColumnDef<AccountType>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.getValue("email")}</div>
+    ),
   },
   {
     id: "actions",

@@ -22,7 +22,6 @@ export default function Layout({
   const cookieStore = cookies();
   const refreshToken = cookieStore.get(REFRESH_TOKEN)?.value;
   const isAuth = Boolean(refreshToken);
-  console.log("isAuth", isAuth);
   return (
     <div className="flex min-h-screen w-full flex-col relative">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">

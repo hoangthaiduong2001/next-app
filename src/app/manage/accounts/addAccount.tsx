@@ -37,6 +37,7 @@ export default function AddEmployee() {
     resolver: zodResolver(CreateEmployeeAccountBody),
     defaultValues: defaultValueAddAccount,
   });
+  const { control, reset, handleSubmit } = form;
   const { name, avatar } = form.getValues();
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
@@ -45,8 +46,8 @@ export default function AddEmployee() {
     return avatar;
   }, [file, avatar]);
 
-  const reset = () => {
-    form.reset();
+  const resetForm = () => {
+    reset();
     setFile(null);
   };
 
@@ -71,7 +72,7 @@ export default function AddEmployee() {
         description: result.response.message,
       });
       setOpen(false);
-      reset();
+      resetForm();
     } catch (error) {
       handleErrorApi({
         error,
@@ -102,13 +103,13 @@ export default function AddEmployee() {
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="add-employee-form"
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormField
-                control={form.control}
+                control={control}
                 name="avatar"
-                render={({ field }) => (
+                render={({ field: { onChange } }) => (
                   <FormItem>
                     <div className="flex gap-2 items-start justify-start">
                       <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
@@ -125,9 +126,7 @@ export default function AddEmployee() {
                           const file = e.target.files?.[0];
                           if (file) {
                             setFile(file);
-                            field.onChange(
-                              "http://localhost:3000/" + file.name
-                            );
+                            onChange("http://localhost:3000/" + file.name);
                           }
                         }}
                         className="hidden"
@@ -146,48 +145,18 @@ export default function AddEmployee() {
               />
 
               <FormField
-                control={form.control}
+                control={control}
                 name="name"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="name">Name</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="name" className="w-full" {...field} />
-                        <FormMessage />
-                      </div>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="email">Email</Label>
-                      <div className="col-span-3 w-full space-y-2">
-                        <Input id="email" className="w-full" {...field} />
-                        <FormMessage />
-                      </div>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="password">Password</Label>
-                      <div className="col-span-3 w-full space-y-2">
                         <Input
-                          id="password"
+                          id="name"
                           className="w-full"
-                          type="password"
-                          {...field}
+                          value={value}
+                          onChange={onChange}
                         />
                         <FormMessage />
                       </div>
@@ -196,9 +165,50 @@ export default function AddEmployee() {
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
+                name="email"
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                      <Label htmlFor="email">Email</Label>
+                      <div className="col-span-3 w-full space-y-2">
+                        <Input
+                          id="email"
+                          className="w-full"
+                          value={value}
+                          onChange={onChange}
+                        />
+                        <FormMessage />
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="password"
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                      <Label htmlFor="password">Password</Label>
+                      <div className="col-span-3 w-full space-y-2">
+                        <Input
+                          id="password"
+                          className="w-full"
+                          type="password"
+                          value={value}
+                          onChange={onChange}
+                        />
+                        <FormMessage />
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
                 name="confirmPassword"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="confirmPassword">Confirm password</Label>
@@ -207,7 +217,8 @@ export default function AddEmployee() {
                           id="confirmPassword"
                           className="w-full"
                           type="password"
-                          {...field}
+                          value={value}
+                          onChange={onChange}
                         />
                         <FormMessage />
                       </div>
