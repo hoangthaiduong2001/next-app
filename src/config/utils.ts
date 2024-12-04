@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { authApiRequest } from "@/apiRequest/auth";
-import { DishStatus } from "@/constants/type";
+import envConfig from "@/config";
+import { DishStatus, TableStatus } from "@/constants/type";
 import { toast } from "@/hooks/useToast";
 import { clsx, type ClassValue } from "clsx";
 import jwt from "jsonwebtoken";
@@ -102,4 +103,29 @@ export const formatCurrency = (number: number) => {
     style: "currency",
     currency: "VND",
   }).format(number);
+};
+
+export const getVietnameseTableStatus = (
+  status: (typeof TableStatus)[keyof typeof TableStatus]
+) => {
+  switch (status) {
+    case TableStatus.Available:
+      return "Available";
+    case TableStatus.Reserved:
+      return "Reserved";
+    default:
+      return "Hidden";
+  }
+};
+
+export const getTableLink = ({
+  token,
+  tableNumber,
+}: {
+  token: string;
+  tableNumber: number;
+}) => {
+  return (
+    envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
+  );
 };

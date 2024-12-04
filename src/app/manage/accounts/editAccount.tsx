@@ -44,6 +44,7 @@ export default function EditEmployee({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: defaultValueEditAccount,
   });
+  const { control, reset, handleSubmit } = form;
   const { name, avatar, changePassword, password, confirmPassword } =
     form.getValues();
   const previewAvatarFromFile = useMemo(() => {
@@ -76,6 +77,7 @@ export default function EditEmployee({
       toast({
         description: (result.response as any).message,
       });
+      setId(undefined);
       onSubmitSuccess && onSubmitSuccess();
     } catch (error) {
       handleErrorApi({
@@ -88,7 +90,7 @@ export default function EditEmployee({
   useEffect(() => {
     if (data) {
       const { name, avatar, email } = data.response.data;
-      form.reset({
+      reset({
         name,
         avatar: avatar ?? undefined,
         email,
@@ -120,13 +122,13 @@ export default function EditEmployee({
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="edit-employee-form"
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormField
-                control={form.control}
+                control={control}
                 name="avatar"
-                render={({ field }) => (
+                render={({ field: { onChange } }) => (
                   <FormItem>
                     <div className="flex gap-2 items-start justify-start">
                       <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
@@ -143,9 +145,7 @@ export default function EditEmployee({
                           const file = e.target.files?.[0];
                           if (file) {
                             setFile(file);
-                            field.onChange(
-                              "http://localhost:3000/" + file.name
-                            );
+                            onChange("http://localhost:3000/" + file.name);
                           }
                         }}
                         className="hidden"
@@ -164,14 +164,19 @@ export default function EditEmployee({
               />
 
               <FormField
-                control={form.control}
+                control={control}
                 name="name"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="name">Name</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="name" className="w-full" {...field} />
+                        <Input
+                          id="name"
+                          className="w-full"
+                          value={value}
+                          onChange={onChange}
+                        />
                         <FormMessage />
                       </div>
                     </div>
@@ -179,14 +184,19 @@ export default function EditEmployee({
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
                 name="email"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="email">Email</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="email" className="w-full" {...field} />
+                        <Input
+                          id="email"
+                          className="w-full"
+                          value={value}
+                          onChange={onChange}
+                        />
                         <FormMessage />
                       </div>
                     </div>
@@ -194,17 +204,14 @@ export default function EditEmployee({
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
                 name="changePassword"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="email">Change password</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch checked={value} onCheckedChange={onChange} />
                         <FormMessage />
                       </div>
                     </div>
@@ -213,9 +220,9 @@ export default function EditEmployee({
               />
               {changePassword && (
                 <FormField
-                  control={form.control}
+                  control={control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field: { value, onChange } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                         <Label htmlFor="password">New password</Label>
@@ -224,7 +231,8 @@ export default function EditEmployee({
                             id="password"
                             className="w-full"
                             type="password"
-                            {...field}
+                            value={value}
+                            onChange={onChange}
                           />
                           <FormMessage />
                         </div>
@@ -235,9 +243,9 @@ export default function EditEmployee({
               )}
               {changePassword && (
                 <FormField
-                  control={form.control}
+                  control={control}
                   name="confirmPassword"
-                  render={({ field }) => (
+                  render={({ field: { value, onChange } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                         <Label htmlFor="confirmPassword">
@@ -248,7 +256,8 @@ export default function EditEmployee({
                             id="confirmPassword"
                             className="w-full"
                             type="password"
-                            {...field}
+                            value={value}
+                            onChange={onChange}
                           />
                           <FormMessage />
                         </div>

@@ -56,10 +56,11 @@ export default function EditDish({
     resolver: zodResolver(UpdateDishBody),
     defaultValues: defaultValueFormDish,
   });
+  const { control, reset, handleSubmit, watch } = form;
   const { data } = useGetDishById({ id: Number(id) });
   const updateDish = useUpdateDish();
   const uploadMediaMutation = useUploadMediaMutation();
-  const { image, name } = form.watch();
+  const { image, name } = watch();
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file);
@@ -86,6 +87,7 @@ export default function EditDish({
         };
       }
       const result = await updateDish.mutateAsync(body);
+      setId(undefined);
       onSubmitSuccess && onSubmitSuccess();
       toast({
         description: result.response.message,
@@ -100,7 +102,7 @@ export default function EditDish({
   useEffect(() => {
     if (data) {
       const { image, name, description, price, status } = data.response.data;
-      form.reset({
+      reset({
         name,
         image: image ?? undefined,
         description,
@@ -108,7 +110,7 @@ export default function EditDish({
         status,
       });
     }
-  }, [data, form]);
+  }, [data, reset]);
   return (
     <Dialog
       open={Boolean(id)}
@@ -128,13 +130,13 @@ export default function EditDish({
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="edit-dish-form"
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormField
-                control={form.control}
+                control={control}
                 name="image"
-                render={({ field }) => (
+                render={({ field: { onChange } }) => (
                   <FormItem>
                     <div className="flex gap-2 items-start justify-start">
                       <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
@@ -151,9 +153,7 @@ export default function EditDish({
                           const file = e.target.files?.[0];
                           if (file) {
                             setFile(file);
-                            field.onChange(
-                              "http://localhost:3000/" + file.name
-                            );
+                            onChange("http://localhost:3000/" + file.name);
                           }
                         }}
                         className="hidden"
@@ -172,14 +172,19 @@ export default function EditDish({
               />
 
               <FormField
-                control={form.control}
+                control={control}
                 name="name"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="name">Name dish</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="name" className="w-full" {...field} />
+                        <Input
+                          id="name"
+                          className="w-full"
+                          value={value}
+                          onChange={onChange}
+                        />
                         <FormMessage />
                       </div>
                     </div>
@@ -187,25 +192,25 @@ export default function EditDish({
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
                 name="price"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="price">Price</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input
-                          {...field}
                           id="price"
                           className="w-full"
                           type="text"
+                          value={value}
                           onChange={(e) => {
                             if (
                               (Number(e.target.value) > 0 &&
                                 typeof Number(e.target.value) === "number") ||
                               e.target.value === ""
                             ) {
-                              field.onChange(e.target.value);
+                              onChange(e.target.value);
                             }
                           }}
                         />
@@ -216,9 +221,9 @@ export default function EditDish({
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
                 name="description"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="description">Dish description</Label>
@@ -226,7 +231,8 @@ export default function EditDish({
                         <Textarea
                           id="description"
                           className="w-full"
-                          {...field}
+                          value={value}
+                          onChange={onChange}
                         />
                         <FormMessage />
                       </div>
@@ -235,17 +241,14 @@ export default function EditDish({
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
                 name="status"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="description">Status</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+                        <Select onValueChange={onChange} defaultValue={value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select status" />
