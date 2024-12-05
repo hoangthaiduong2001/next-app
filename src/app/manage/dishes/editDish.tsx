@@ -28,9 +28,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { getVietnameseDishStatus, handleErrorApi } from "@/config/utils";
 import { DishStatusValues } from "@/constants/type";
+import { useGetDishById, useUpdateDish } from "@/hooks/useDish";
+import { useUploadMediaMutation } from "@/hooks/useMedia";
 import { toast } from "@/hooks/useToast";
-import { useGetDishById, useUpdateDish } from "@/queries/useDish";
-import { useUploadMediaMutation } from "@/queries/useMedia";
 import {
   UpdateDishBody,
   UpdateDishBodyType,

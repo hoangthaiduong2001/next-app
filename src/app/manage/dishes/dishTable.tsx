@@ -51,8 +51,8 @@ import {
   getVietnameseDishStatus,
   handleErrorApi,
 } from "@/config/utils";
+import { useDeleteDish, useGetListDish } from "@/hooks/useDish";
 import { toast } from "@/hooks/useToast";
-import { useDeleteDish, useGetListDish } from "@/queries/useDish";
 import { DishListResType } from "@/schemaValidations/dish.schema";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";

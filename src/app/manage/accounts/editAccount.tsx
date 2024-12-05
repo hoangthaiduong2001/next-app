@@ -14,9 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { handleErrorApi } from "@/config/utils";
+import { useGetAccountById, useUpdateAccount } from "@/hooks/useAccount";
+import { useUploadMediaMutation } from "@/hooks/useMedia";
 import { toast } from "@/hooks/useToast";
-import { useGetAccountById, useUpdateAccount } from "@/queries/useAccount";
-import { useUploadMediaMutation } from "@/queries/useMedia";
 import {
   UpdateEmployeeAccountBody,
   UpdateEmployeeAccountBodyType,
