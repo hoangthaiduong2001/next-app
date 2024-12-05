@@ -3,7 +3,7 @@
 import { useAppContext } from "@/components/AppProvider";
 import { getRefreshTokenFromLocalStorage } from "@/config/storage";
 import { REFRESH_TOKEN } from "@/constants/auth";
-import { useLogoutMutation } from "@/queries/useAuth";
+import { useLogoutMutation } from "@/hooks/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 

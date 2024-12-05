@@ -14,9 +14,9 @@ import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { handleErrorApi } from "@/config/utils";
+import { useAddAccount } from "@/hooks/useAccount";
+import { useUploadMediaMutation } from "@/hooks/useMedia";
 import { toast } from "@/hooks/useToast";
-import { useAddAccount } from "@/queries/useAccount";
-import { useUploadMediaMutation } from "@/queries/useMedia";
 import {
   CreateEmployeeAccountBody,
   CreateEmployeeAccountBodyType,
@@ -32,7 +32,7 @@ export default function AddEmployee() {
   const [open, setOpen] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const uploadMediaMutation = useUploadMediaMutation();
-  const addAccount = useAddAccount();
+  const { mutate: createAccount, status } = useAddAccount();
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
     defaultValues: defaultValueAddAccount,
@@ -52,33 +52,33 @@ export default function AddEmployee() {
   };
 
   const onSubmit = async (value: CreateEmployeeAccountBodyType) => {
-    if (addAccount.isPending) return;
-    try {
-      let body = value;
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const uploadImageResult = await uploadMediaMutation.mutateAsync(
-          formData
-        );
-        const imageUrl = uploadImageResult.response.data;
-        body = {
-          ...value,
-          avatar: imageUrl,
-        };
-      }
-      const result = await addAccount.mutateAsync(body);
-      toast({
-        description: result.response.message,
-      });
-      setOpen(false);
-      resetForm();
-    } catch (error) {
-      handleErrorApi({
-        error,
-        setError: form.setError,
-      });
+    if (status === "pending") return;
+    let body = value;
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadImageResult = await uploadMediaMutation.mutateAsync(formData);
+      const imageUrl = uploadImageResult.response.data;
+      body = {
+        ...value,
+        avatar: imageUrl,
+      };
     }
+    createAccount(body, {
+      onSuccess: (data) => {
+        toast({
+          description: data.response.message,
+        });
+        setOpen(false);
+        resetForm();
+      },
+      onError(error) {
+        handleErrorApi({
+          error,
+          setError: form.setError,
+        });
+      },
+    });
   };
 
   return (

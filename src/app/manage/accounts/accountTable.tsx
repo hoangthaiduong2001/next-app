@@ -48,8 +48,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { handleErrorApi } from "@/config/utils";
+import { useDeleteAccount, useGetListAccount } from "@/hooks/useAccount";
 import { toast } from "@/hooks/useToast";
-import { useDeleteAccount, useGetListAccount } from "@/queries/useAccount";
 import { AccountType } from "@/schemaValidations/account.schema";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";

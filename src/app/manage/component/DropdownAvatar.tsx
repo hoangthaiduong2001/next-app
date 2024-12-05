@@ -11,9 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLogoutMutation } from "@/hooks/useAuth";
+import { useGetProfileMe } from "@/hooks/useMe";
 import { toast } from "@/hooks/useToast";
-import { useLogoutMutation } from "@/queries/useAuth";
-import { useGetProfileMe } from "@/queries/useMe";
 import { pathApp } from "@/routes/path";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
