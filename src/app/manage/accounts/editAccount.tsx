@@ -25,7 +25,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { defaultValueEditAccount } from "./const";
 import { EditEmployeeType } from "./type";
 
 export default function EditEmployee({
@@ -38,13 +37,18 @@ export default function EditEmployee({
   const { data } = useGetAccountById({
     id: Number(id),
   });
-  const updateAccount = useUpdateAccount();
+  const { mutate: updateAccount, status } = useUpdateAccount();
   const uploadMediaMutation = useUploadMediaMutation();
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
-    defaultValues: defaultValueEditAccount,
+    values: {
+      name: data?.response.data.name || "",
+      email: data?.response.data.email || "",
+      avatar: data?.response.data.avatar || "",
+      changePassword: false,
+    },
   });
-  const { control, reset, handleSubmit } = form;
+  const { control, handleSubmit, reset, clearErrors } = form;
   const { name, avatar, changePassword, password, confirmPassword } =
     form.getValues();
   const previewAvatarFromFile = useMemo(() => {
@@ -55,51 +59,50 @@ export default function EditEmployee({
   }, [file, avatar]);
 
   const onSubmit = async (value: UpdateEmployeeAccountBodyType) => {
-    if (updateAccount.isPending) return;
-    try {
-      let body: UpdateEmployeeAccountBodyType & { id: number } = {
-        id: Number(id),
-        ...value,
+    if (status === "pending") return;
+    let body: UpdateEmployeeAccountBodyType & { id: number } = {
+      id: Number(id),
+      ...value,
+    };
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadImageResult = await uploadMediaMutation.mutateAsync(formData);
+      const imageUrl = uploadImageResult.response.data;
+      body = {
+        ...body,
+        avatar: imageUrl,
       };
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const uploadImageResult = await uploadMediaMutation.mutateAsync(
-          formData
-        );
-        const imageUrl = uploadImageResult.response.data;
-        body = {
-          ...body,
-          avatar: imageUrl,
-        };
-      }
-      const result = await updateAccount.mutateAsync(body);
-      toast({
-        description: (result.response as any).message,
-      });
-      setId(undefined);
-      onSubmitSuccess && onSubmitSuccess();
-    } catch (error) {
-      handleErrorApi({
-        error,
-        setError: form.setError,
-      });
     }
+    updateAccount(body, {
+      onSuccess: (data) => {
+        toast({
+          description: data.response.message,
+        });
+        setId(undefined);
+        onSubmitSuccess && onSubmitSuccess();
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError,
+        });
+      },
+    });
   };
-
   useEffect(() => {
-    if (data) {
-      const { name, avatar, email } = data.response.data;
+    if (changePassword === false) {
       reset({
-        name,
-        avatar: avatar ?? undefined,
-        email,
-        changePassword,
-        password,
-        confirmPassword,
+        ...form.getValues(),
+        password: "",
+        confirmPassword: "",
       });
+      clearErrors("confirmPassword");
+      clearErrors("password");
+    } else if (password?.length && confirmPassword?.length) {
+      clearErrors("changePassword");
     }
-  }, [data, form]);
+  }, [changePassword, password, confirmPassword]);
 
   return (
     <Dialog
@@ -210,8 +213,13 @@ export default function EditEmployee({
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="email">Change password</Label>
-                      <div className="col-span-3 w-full space-y-2">
-                        <Switch checked={value} onCheckedChange={onChange} />
+                      <div className="flex flex-col col-span-3 w-full space-y-2">
+                        <Switch
+                          checked={value}
+                          onCheckedChange={(newValue) => {
+                            onChange(newValue);
+                          }}
+                        />
                         <FormMessage />
                       </div>
                     </div>

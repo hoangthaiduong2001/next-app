@@ -40,7 +40,7 @@ export const CreateEmployeeAccountBody = z
     if (confirmPassword !== password) {
       ctx.addIssue({
         code: "custom",
-        message: "Mật khẩu không khớp",
+        message: "Password",
         path: ["confirmPassword"],
       });
     }

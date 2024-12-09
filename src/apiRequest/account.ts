@@ -11,7 +11,7 @@ const accountApiRequest = {
   addAccount: (body: CreateEmployeeAccountBodyType) =>
     http.post<AccountResType>("/accounts", body),
   updateAccount: (id: number, body: UpdateEmployeeAccountBodyType) =>
-    http.put(`/accounts/detail/${id}`, body),
+    http.put<AccountResType>(`/accounts/detail/${id}`, body),
   getAccountById: (id: number) =>
     http.get<AccountResType>(`/accounts/detail/${id}`),
   deleteAccount: (id: number) =>
