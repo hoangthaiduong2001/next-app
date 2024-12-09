@@ -72,7 +72,7 @@ export default function AddEmployee() {
         setOpen(false);
         resetForm();
       },
-      onError(error) {
+      onError: (error) => {
         handleErrorApi({
           error,
           setError: form.setError,
