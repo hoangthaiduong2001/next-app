@@ -66,7 +66,7 @@ export const useDeleteAccount = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.listAccount, queryKeys.accountById],
+        queryKey: [queryKeys.listAccount],
       });
     },
   });

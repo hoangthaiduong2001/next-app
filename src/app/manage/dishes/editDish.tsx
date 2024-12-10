@@ -37,9 +37,8 @@ import {
 } from "@/schemaValidations/dish.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { defaultValueFormDish } from "./const";
 
 export default function EditDish({
   id,
@@ -52,13 +51,19 @@ export default function EditDish({
 }) {
   const [file, setFile] = useState<File | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const { data } = useGetDishById({ id: Number(id) });
   const form = useForm<UpdateDishBodyType>({
     resolver: zodResolver(UpdateDishBody),
-    defaultValues: defaultValueFormDish,
+    values: {
+      name: data?.response.data.name || "",
+      image: data?.response.data.image || "",
+      description: data?.response.data.description || "",
+      price: data?.response.data.price || 0,
+      status: data?.response.data.status,
+    },
   });
-  const { control, reset, handleSubmit, watch } = form;
-  const { data } = useGetDishById({ id: Number(id) });
-  const updateDish = useUpdateDish();
+  const { control, handleSubmit, watch, setError } = form;
+  const { mutate: updateDish, status } = useUpdateDish();
   const uploadMediaMutation = useUploadMediaMutation();
   const { image, name } = watch();
   const previewAvatarFromFile = useMemo(() => {
@@ -68,49 +73,38 @@ export default function EditDish({
     return image;
   }, [file, image]);
   const onSubmit = async (value: UpdateDishBodyType) => {
-    if (updateDish.isPending) return;
-    try {
-      let body: UpdateDishBodyType & { id: number } = {
-        ...value,
-        id: Number(id),
+    if (status === "pending") return;
+    let body: UpdateDishBodyType & { id: number } = {
+      ...value,
+      id: Number(id),
+    };
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const updateImageResult = await uploadMediaMutation.mutateAsync(formData);
+      const imageUrl = await updateImageResult.response.data;
+      body = {
+        ...body,
+        image: imageUrl,
       };
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const updateImageResult = await uploadMediaMutation.mutateAsync(
-          formData
-        );
-        const imageUrl = await updateImageResult.response.data;
-        body = {
-          ...body,
-          image: imageUrl,
-        };
-      }
-      const result = await updateDish.mutateAsync(body);
-      setId(undefined);
-      onSubmitSuccess && onSubmitSuccess();
-      toast({
-        description: result.response.message,
-      });
-    } catch (error) {
-      handleErrorApi({
-        error,
-        setError: form.setError,
-      });
     }
+    updateDish(body, {
+      onSuccess: (data) => {
+        setId(undefined);
+        onSubmitSuccess && onSubmitSuccess();
+        toast({
+          description: data.response.message,
+        });
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError,
+        });
+      },
+    });
   };
-  useEffect(() => {
-    if (data) {
-      const { image, name, description, price, status } = data.response.data;
-      reset({
-        name,
-        image: image ?? undefined,
-        description,
-        price,
-        status,
-      });
-    }
-  }, [data, reset]);
+
   return (
     <Dialog
       open={Boolean(id)}

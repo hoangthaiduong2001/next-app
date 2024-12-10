@@ -44,11 +44,11 @@ export default function EditEmployee({
     values: {
       name: data?.response.data.name || "",
       email: data?.response.data.email || "",
-      avatar: data?.response.data.avatar || "",
+      avatar: data?.response.data.avatar ?? undefined,
       changePassword: false,
     },
   });
-  const { control, handleSubmit, reset, clearErrors } = form;
+  const { control, handleSubmit, reset, clearErrors, setError } = form;
   const { name, avatar, changePassword, password, confirmPassword } =
     form.getValues();
   const previewAvatarFromFile = useMemo(() => {
@@ -62,6 +62,7 @@ export default function EditEmployee({
     if (status === "pending") return;
     let body: UpdateEmployeeAccountBodyType & { id: number } = {
       id: Number(id),
+      avatar: value.avatar || undefined,
       ...value,
     };
     if (file) {
@@ -85,7 +86,7 @@ export default function EditEmployee({
       onError: (error) => {
         handleErrorApi({
           error,
-          setError: form.setError,
+          setError,
         });
       },
     });
@@ -94,8 +95,8 @@ export default function EditEmployee({
     if (changePassword === false) {
       reset({
         ...form.getValues(),
-        password: "",
-        confirmPassword: "",
+        password: undefined,
+        confirmPassword: undefined,
       });
       clearErrors("confirmPassword");
       clearErrors("password");

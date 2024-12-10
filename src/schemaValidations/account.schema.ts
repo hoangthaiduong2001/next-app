@@ -40,7 +40,7 @@ export const CreateEmployeeAccountBody = z
     if (confirmPassword !== password) {
       ctx.addIssue({
         code: "custom",
-        message: "Password",
+        message: "Confirm password not match",
         path: ["confirmPassword"],
       });
     }

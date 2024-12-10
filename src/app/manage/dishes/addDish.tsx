@@ -46,7 +46,7 @@ export default function AddDish() {
   const [open, setOpen] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const uploadMediaMutation = useUploadMediaMutation();
-  const addDish = useAddDish();
+  const { mutate: createDish, status } = useAddDish();
   const form = useForm<CreateDishBodyType>({
     resolver: zodResolver(CreateDishBody),
     defaultValues: defaultValueFormDish,
@@ -66,32 +66,33 @@ export default function AddDish() {
   };
 
   const onSubmit = async (value: CreateDishBodyType) => {
-    if (addDish.isPending) return;
-    try {
-      let body = value;
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const updateImageResult = await uploadMediaMutation.mutateAsync(
-          formData
-        );
-        const imageUrl = updateImageResult.response.data;
-        body = {
-          ...value,
-          image: imageUrl,
-        };
-      }
-      const result = await addDish.mutateAsync(body);
-      toast({
-        description: result.response.message,
-      });
-      setOpen(false);
-    } catch (error) {
-      handleErrorApi({
-        error,
-        setError: form.setError,
-      });
+    if (status === "pending") return;
+    let body = value;
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const updateImageResult = await uploadMediaMutation.mutateAsync(formData);
+      const imageUrl = updateImageResult.response.data;
+      body = {
+        ...value,
+        image: imageUrl,
+      };
     }
+    createDish(body, {
+      onSuccess: (data) => {
+        toast({
+          description: data.response.message,
+        });
+        setOpen(false);
+        resetForm();
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError,
+        });
+      },
+    });
   };
 
   return (

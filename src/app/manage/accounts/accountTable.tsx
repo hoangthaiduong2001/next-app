@@ -165,20 +165,22 @@ function AlertDialogDeleteAccount({
   employeeDelete: AccountItem | null;
   setEmployeeDelete: (value: AccountItem | null) => void;
 }) {
-  const { mutateAsync } = useDeleteAccount();
-  const deleteAccount = async () => {
+  const { mutate: deleteAccount } = useDeleteAccount();
+  const handleDeleteAccount = () => {
     if (employeeDelete) {
-      try {
-        const result = await mutateAsync(employeeDelete.id);
-        setEmployeeDelete(null);
-        toast({
-          title: result.response.message,
-        });
-      } catch (error) {
-        handleErrorApi({
-          error,
-        });
-      }
+      deleteAccount(employeeDelete.id, {
+        onSuccess: (data) => {
+          setEmployeeDelete(null);
+          toast({
+            title: data.response.message,
+          });
+        },
+        onError: (error) => {
+          handleErrorApi({
+            error,
+          });
+        },
+      });
     }
   };
   return (
@@ -203,7 +205,9 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={deleteAccount}>Delete</AlertDialogAction>
+          <AlertDialogAction onClick={handleDeleteAccount}>
+            Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
