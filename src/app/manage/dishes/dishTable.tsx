@@ -168,18 +168,20 @@ function AlertDialogDeleteDish({
   dishDelete: DishItem | null;
   setDishDelete: (value: DishItem | null) => void;
 }) {
-  const { mutateAsync } = useDeleteDish();
-  const deleteDish = async () => {
+  const { mutate: deleteDish } = useDeleteDish();
+  const handleDeleteDish = () => {
     if (dishDelete) {
-      try {
-        const result = await mutateAsync(dishDelete.id);
-        setDishDelete(null);
-        toast({
-          title: result.response.message,
-        });
-      } catch (error) {
-        handleErrorApi({ error });
-      }
+      deleteDish(dishDelete.id, {
+        onSuccess: (data) => {
+          setDishDelete(null);
+          toast({
+            title: data.response.message,
+          });
+        },
+        onError: (error) => {
+          handleErrorApi({ error });
+        },
+      });
     }
   };
   return (
@@ -204,7 +206,9 @@ function AlertDialogDeleteDish({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={deleteDish}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDeleteDish}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

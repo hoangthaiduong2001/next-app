@@ -1,18 +1,27 @@
 import dishApiRequest from "@/apiRequest/dish";
-import { UpdateDishBodyType } from "@/schemaValidations/dish.schema";
+import {
+  CreateDishBodyType,
+  UpdateDishBodyType,
+} from "@/schemaValidations/dish.schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+const queryKeys = {
+  listDish: "get-list-dish",
+  dishById: "get-dish-by-id",
+};
 export const useGetListDish = () => {
   return useQuery({
-    queryKey: ["dishes"],
+    queryKey: [queryKeys.listDish],
     queryFn: dishApiRequest.getListDish,
   });
 };
 
 export const useGetDishById = ({ id }: { id: number }) => {
   return useQuery({
-    queryKey: ["dishes", id],
-    queryFn: () => dishApiRequest.getDishById(id),
+    queryKey: [queryKeys.listDish, id],
+    queryFn: async () => {
+      return await dishApiRequest.getDishById(id);
+    },
     enabled: !!id,
   });
 };
@@ -20,10 +29,12 @@ export const useGetDishById = ({ id }: { id: number }) => {
 export const useAddDish = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: dishApiRequest.addDish,
+    mutationFn: (body: CreateDishBodyType) => {
+      return dishApiRequest.addDish(body);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["dishes"],
+        queryKey: [queryKeys.listDish],
       });
     },
   });
@@ -36,7 +47,7 @@ export const useUpdateDish = () => {
       dishApiRequest.updateDish(id, body),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["dishes"],
+        queryKey: [queryKeys.listDish],
         exact: true,
       });
     },
@@ -46,10 +57,12 @@ export const useUpdateDish = () => {
 export const useDeleteDish = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: dishApiRequest.deleteDish,
+    mutationFn: (id: number) => {
+      return dishApiRequest.deleteDish(id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["dishes"],
+        queryKey: [queryKeys.listDish],
       });
     },
   });

@@ -82,7 +82,13 @@ export default function AddEmployee() {
   };
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        setOpen(value);
+        resetForm();
+      }}
+      open={open}
+    >
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
