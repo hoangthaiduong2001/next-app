@@ -1,17 +1,25 @@
 import tableApiRequest from "@/apiRequest/table";
-import { UpdateTableBodyType } from "@/schemaValidations/table.schema";
+import {
+  CreateTableBodyType,
+  UpdateTableBodyType,
+} from "@/schemaValidations/table.schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+const queryKeys = {
+  listTable: "get-list-table",
+  tableById: "get-table-by-id",
+};
 
 export const useGetListTable = () => {
   return useQuery({
-    queryKey: ["tables"],
+    queryKey: [queryKeys.listTable],
     queryFn: tableApiRequest.getListTable,
   });
 };
 
 export const useGetTableById = ({ id }: { id: number }) => {
   return useQuery({
-    queryKey: ["tables", id],
+    queryKey: [queryKeys.tableById, id],
     queryFn: () => tableApiRequest.getTableById(id),
     enabled: !!id,
   });
@@ -20,10 +28,12 @@ export const useGetTableById = ({ id }: { id: number }) => {
 export const useAddTable = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: tableApiRequest.addTable,
+    mutationFn: async (body: CreateTableBodyType) => {
+      return await tableApiRequest.addTable(body);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tables"],
+        queryKey: [queryKeys.listTable],
       });
     },
   });
@@ -36,7 +46,7 @@ export const useUpdateTable = () => {
       tableApiRequest.updateTable(id, body),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tables"],
+        queryKey: [queryKeys.listTable],
         exact: true,
       });
     },
@@ -46,10 +56,12 @@ export const useUpdateTable = () => {
 export const useDeleteTable = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: tableApiRequest.deleteTable,
+    mutationFn: (id: number) => {
+      return tableApiRequest.deleteTable(id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tables"],
+        queryKey: [queryKeys.listTable],
       });
     },
   });

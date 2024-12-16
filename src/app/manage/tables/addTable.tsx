@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/select";
 import { getVietnameseTableStatus } from "@/config/utils";
 import { TableStatusValues } from "@/constants/type";
+import { useAddTable } from "@/hooks/useTable";
+import { toast } from "@/hooks/useToast";
 import {
   CreateTableBody,
   CreateTableBodyType,
@@ -39,13 +41,32 @@ import { defaultValueAddable } from "./const";
 
 export default function AddTable() {
   const [open, setOpen] = useState(false);
+  const { mutate: createTable, status } = useAddTable();
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: defaultValueAddable,
   });
   const { control, reset, handleSubmit } = form;
+  const onSubmit = (value: CreateTableBodyType) => {
+    if (status === "pending") return;
+    createTable(value, {
+      onSuccess: (data) => {
+        toast({
+          description: data.response.message,
+        });
+        setOpen(false);
+        reset();
+      },
+    });
+  };
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        setOpen(value);
+        reset();
+      }}
+      open={open}
+    >
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
@@ -66,6 +87,7 @@ export default function AddTable() {
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="add-table-form"
+            onSubmit={handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormField

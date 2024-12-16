@@ -18,6 +18,7 @@ import {
 import AddTable from "@/app/manage/tables/addTable";
 import EditTable from "@/app/manage/tables/editTable";
 import AutoPagination from "@/components/component/autoPagination";
+import QrCodeTable from "@/components/component/QrCodeTable";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +47,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getVietnameseTableStatus } from "@/config/utils";
+import { useGetListTable } from "@/hooks/useTable";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -69,27 +71,38 @@ export const columns: ColumnDef<TableItem>[] = [
     accessorKey: "number",
     header: "ID",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("number")}</div>
+      <div className="capitalize text-center">{row.getValue("number")}</div>
     ),
   },
   {
     accessorKey: "capacity",
     header: "Capacity",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("capacity")}</div>
+      <div className="capitalize text-center">{row.getValue("capacity")}</div>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div>{getVietnameseTableStatus(row.getValue("status"))}</div>
+      <div className="text-center">
+        {getVietnameseTableStatus(row.getValue("status"))}
+      </div>
     ),
   },
   {
     accessorKey: "token",
     header: "QR Code",
-    cell: ({ row }) => <div>{row.getValue("number")}</div>,
+    cell: ({ row }) => (
+      <div className="inline-block">
+        {
+          <QrCodeTable
+            token={row.getValue("token")}
+            tableNumber={row.getValue("number")}
+          />
+        }
+      </div>
+    ),
   },
   {
     id: "actions",
@@ -162,14 +175,15 @@ function AlertDialogDeleteTable({
 }
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10;
-export default function TableTable() {
+export default function TableOfTable() {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
   const pageIndex = page - 1;
   // const params = Object.fromEntries(searchParam.entries())
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>();
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null);
-  const data: any[] = [];
+  const listTable = useGetListTable();
+  const data = listTable.data?.response.data || [];
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
