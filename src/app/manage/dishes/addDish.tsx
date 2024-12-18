@@ -1,4 +1,5 @@
 "use client";
+import revalidateApiRequest from "@/apiRequest/revalidate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,6 +84,7 @@ export default function AddDish() {
         toast({
           description: data.response.message,
         });
+        revalidateApiRequest("dishes");
         setOpen(false);
         resetForm();
       },
