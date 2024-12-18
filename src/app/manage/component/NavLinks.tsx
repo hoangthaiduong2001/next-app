@@ -10,7 +10,7 @@ import { pathApp } from "@/routes/path";
 import { Package2, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import menuItems from "./MenuItems";
+import menuItems from "../constant";
 
 export default function NavLinks() {
   const pathname = usePathname();
