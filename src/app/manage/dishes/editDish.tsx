@@ -1,4 +1,5 @@
 "use client";
+import revalidateApiRequest from "@/apiRequest/revalidate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -92,6 +93,7 @@ export default function EditDish({
       onSuccess: (data) => {
         setId(undefined);
         onSubmitSuccess && onSubmitSuccess();
+        revalidateApiRequest("dishes");
         toast({
           description: data.response.message,
         });
