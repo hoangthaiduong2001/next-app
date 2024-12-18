@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getVietnameseTableStatus } from "@/config/utils";
+import { getVietnameseTableStatus, handleErrorApi } from "@/config/utils";
 import { TableStatusValues } from "@/constants/type";
 import { useAddTable } from "@/hooks/useTable";
 import { toast } from "@/hooks/useToast";
@@ -46,7 +46,7 @@ export default function AddTable() {
     resolver: zodResolver(CreateTableBody),
     defaultValues: defaultValueAddable,
   });
-  const { control, reset, handleSubmit } = form;
+  const { control, reset, handleSubmit, setError } = form;
   const onSubmit = (value: CreateTableBodyType) => {
     if (status === "pending") return;
     createTable(value, {
@@ -56,6 +56,9 @@ export default function AddTable() {
         });
         setOpen(false);
         reset();
+      },
+      onError: (error) => {
+        handleErrorApi({ error, setError });
       },
     });
   };

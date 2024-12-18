@@ -1,4 +1,5 @@
 "use client";
+import QrCodeTable from "@/components/component/QrCodeTable";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,8 +25,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { getTableLink, getVietnameseTableStatus } from "@/config/utils";
+import {
+  getTableLink,
+  getVietnameseTableStatus,
+  handleErrorApi,
+} from "@/config/utils";
 import { TableStatusValues } from "@/constants/type";
+import { useGetTableById, useUpdateTable } from "@/hooks/useTable";
+import { toast } from "@/hooks/useToast";
 import {
   UpdateTableBody,
   UpdateTableBodyType,
@@ -33,7 +40,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { defaultValueEditTable } from "./const";
 
 export default function EditTable({
   id,
@@ -44,12 +50,40 @@ export default function EditTable({
   setId: (value: number | undefined) => void;
   onSubmitSuccess?: () => void;
 }) {
+  const { data } = useGetTableById({ id: Number(id) });
+  const { mutate: updateTable, status } = useUpdateTable();
   const form = useForm<UpdateTableBodyType>({
     resolver: zodResolver(UpdateTableBody),
-    defaultValues: defaultValueEditTable,
+    values: {
+      capacity: data?.response.data.capacity || 0,
+      status: data?.response.data.status,
+      changeToken: false,
+    },
   });
-  const { control, reset, handleSubmit } = form;
-  const tableNumber = 0;
+  const { control, reset, handleSubmit, setError } = form;
+  const onSubmit = async (value: UpdateTableBodyType) => {
+    if (status === "pending") return;
+    let body: UpdateTableBodyType & { id: number } = {
+      ...value,
+      id: Number(id),
+    };
+
+    updateTable(body, {
+      onSuccess: (data) => {
+        setId(undefined);
+        onSubmitSuccess && onSubmitSuccess();
+        toast({
+          description: data.response.message,
+        });
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError,
+        });
+      },
+    });
+  };
 
   return (
     <Dialog
@@ -75,6 +109,7 @@ export default function EditTable({
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="edit-table-form"
+            onSubmit={handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormItem>
@@ -85,7 +120,7 @@ export default function EditTable({
                       id="number"
                       type="number"
                       className="w-full"
-                      value={tableNumber}
+                      value={data?.response.data.number || 0}
                       readOnly
                     />
                     <FormMessage />
@@ -174,27 +209,36 @@ export default function EditTable({
               <FormItem>
                 <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                   <Label>QR Code</Label>
-                  <div className="col-span-3 w-full space-y-2"></div>
+                  <div className="col-span-3 w-full space-y-2">
+                    {data && (
+                      <QrCodeTable
+                        token={data.response.data.token}
+                        tableNumber={data.response.data.number}
+                      />
+                    )}
+                  </div>
                 </div>
               </FormItem>
               <FormItem>
                 <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                   <Label>URL order</Label>
-                  <div className="col-span-3 w-full space-y-2">
-                    <Link
-                      href={getTableLink({
-                        token: "123123123",
-                        tableNumber: tableNumber,
-                      })}
-                      target="_blank"
-                      className="break-all"
-                    >
-                      {getTableLink({
-                        token: "123123123",
-                        tableNumber: tableNumber,
-                      })}
-                    </Link>
-                  </div>
+                  {data && (
+                    <div className="col-span-3 w-full space-y-2">
+                      <Link
+                        href={getTableLink({
+                          token: data.response.data.token,
+                          tableNumber: data.response.data.number,
+                        })}
+                        target="_blank"
+                        className="break-all"
+                      >
+                        {getTableLink({
+                          token: data.response.data.token,
+                          tableNumber: data.response.data.number,
+                        })}
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </FormItem>
             </div>
