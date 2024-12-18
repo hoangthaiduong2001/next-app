@@ -46,8 +46,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getVietnameseTableStatus } from "@/config/utils";
-import { useGetListTable } from "@/hooks/useTable";
+import { getVietnameseTableStatus, handleErrorApi } from "@/config/utils";
+import { useDeleteTable, useGetListTable } from "@/hooks/useTable";
+import { toast } from "@/hooks/useToast";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import { useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -73,6 +74,10 @@ export const columns: ColumnDef<TableItem>[] = [
     cell: ({ row }) => (
       <div className="capitalize text-center">{row.getValue("number")}</div>
     ),
+    filterFn: (rows, columnId, filterValue) => {
+      if (!filterValue) return true;
+      return String(filterValue) === String(rows.getValue("number"));
+    },
   },
   {
     accessorKey: "capacity",
@@ -145,6 +150,22 @@ function AlertDialogDeleteTable({
   tableDelete: TableItem | null;
   setTableDelete: (value: TableItem | null) => void;
 }) {
+  const { mutate: deleteTable } = useDeleteTable();
+  const handleDeleteTable = () => {
+    if (tableDelete) {
+      deleteTable(tableDelete.number, {
+        onSuccess: (data) => {
+          setTableDelete(null);
+          toast({
+            title: data.response.message,
+          });
+        },
+        onError: (error) => {
+          handleErrorApi({ error });
+        },
+      });
+    }
+  };
   return (
     <AlertDialog
       open={Boolean(tableDelete)}
@@ -167,7 +188,9 @@ function AlertDialogDeleteTable({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDeleteTable}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
