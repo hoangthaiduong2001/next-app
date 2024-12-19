@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { authApiRequest } from "@/apiRequest/auth";
 import envConfig from "@/config";
-import { DishStatus, TableStatus } from "@/constants/type";
+import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
 import { toast } from "@/hooks/useToast";
 import { clsx, type ClassValue } from "clsx";
+import { format } from "date-fns";
 import jwt from "jsonwebtoken";
+import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react";
 import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { EntityError } from "./services";
@@ -128,4 +130,50 @@ export const getTableLink = ({
   return (
     envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
   );
+};
+
+export function removeAccents(str: string) {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+}
+
+export const simpleMatchText = (fullText: string, matchText: string) => {
+  return removeAccents(fullText.toLowerCase()).includes(
+    removeAccents(matchText.trim().toLowerCase())
+  );
+};
+
+export const formatDateTimeToLocaleString = (date: string | Date) => {
+  return format(
+    date instanceof Date ? date : new Date(date),
+    "HH:mm:ss dd/MM/yyyy"
+  );
+};
+
+export const getVietnameseOrderStatus = (
+  status: (typeof OrderStatus)[keyof typeof OrderStatus]
+) => {
+  switch (status) {
+    case OrderStatus.Delivered:
+      return "Delivered";
+    case OrderStatus.Paid:
+      return "Paid";
+    case OrderStatus.Pending:
+      return "Pending";
+    case OrderStatus.Processing:
+      return "Processing";
+    default:
+      return "Reject";
+  }
+};
+
+export const OrderStatusIcon = {
+  [OrderStatus.Pending]: Loader,
+  [OrderStatus.Processing]: CookingPot,
+  [OrderStatus.Rejected]: BookX,
+  [OrderStatus.Delivered]: Truck,
+  [OrderStatus.Paid]: HandCoins,
 };

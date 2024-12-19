@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdownMenu";
 import { useLogoutMutation } from "@/hooks/useAuth";
 import { useGetProfileMe } from "@/hooks/useMe";
 import { toast } from "@/hooks/useToast";
