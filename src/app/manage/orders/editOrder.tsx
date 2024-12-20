@@ -98,6 +98,8 @@ export default function EditOrder({
     },
   });
 
+  const { control, handleSubmit } = form;
+
   const onSubmit = async (values: UpdateOrderBodyType) => {};
 
   const reset = () => {
@@ -122,15 +124,15 @@ export default function EditOrder({
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="edit-order-form"
-            onSubmit={form.handleSubmit(onSubmit, console.log)}
+            onSubmit={handleSubmit(onSubmit, console.log)}
           >
             <div className="grid gap-4 py-4">
               <FormField
-                control={form.control}
+                control={control}
                 name="dishId"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center justify-items-start gap-4">
-                    <FormLabel>Món ăn</FormLabel>
+                    <FormLabel>Dish</FormLabel>
                     <div className="flex items-center col-span-2 space-x-4">
                       <Avatar className="aspect-square w-[50px] h-[50px] rounded-md object-cover">
                         <AvatarImage src={selectedDish?.image} />
@@ -152,9 +154,9 @@ export default function EditOrder({
               />
 
               <FormField
-                control={form.control}
+                control={control}
                 name="quantity"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="quantity">Quantity</Label>
@@ -164,15 +166,14 @@ export default function EditOrder({
                           inputMode="numeric"
                           pattern="[0-9]*"
                           className="w-16 text-center"
-                          {...field}
-                          value={field.value}
+                          value={value}
                           onChange={(e) => {
                             let value = e.target.value;
                             const numberValue = Number(value);
                             if (isNaN(numberValue)) {
                               return;
                             }
-                            field.onChange(numberValue);
+                            onChange(numberValue);
                           }}
                         />
                         <FormMessage />
@@ -182,16 +183,13 @@ export default function EditOrder({
                 )}
               />
               <FormField
-                control={form.control}
+                control={control}
                 name="status"
-                render={({ field }) => (
+                render={({ field: { value, onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <FormLabel>Status</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
+                      <Select onValueChange={onChange} value={value}>
                         <FormControl className="col-span-3">
                           <SelectTrigger className="w-[200px]">
                             <SelectValue placeholder="Status" />
