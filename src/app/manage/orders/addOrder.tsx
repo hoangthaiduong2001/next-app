@@ -54,8 +54,9 @@ export default function AddOrder() {
       tableNumber: 0,
     },
   });
-  const name = form.watch("name");
-  const tableNumber = form.watch("tableNumber");
+  const { control, watch } = form;
+  const name = watch("name");
+  const tableNumber = watch("tableNumber");
 
   const handleQuantityChange = (dishId: number, quantity: number) => {
     setOrders((prevOrders) => {
@@ -107,14 +108,19 @@ export default function AddOrder() {
             >
               <div className="grid gap-4 py-4">
                 <FormField
-                  control={form.control}
+                  control={control}
                   name="name"
-                  render={({ field }) => (
+                  render={({ field: { value, onChange } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                         <Label htmlFor="name">Name customer</Label>
                         <div className="col-span-3 w-full space-y-2">
-                          <Input id="name" className="w-full" {...field} />
+                          <Input
+                            id="name"
+                            className="w-full"
+                            value={value}
+                            onChange={onChange}
+                          />
                           <FormMessage />
                         </div>
                       </div>
@@ -122,18 +128,18 @@ export default function AddOrder() {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  control={control}
                   name="tableNumber"
-                  render={({ field }) => (
+                  render={({ field: { value, onChange } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="tableNumber">Chọn bàn</Label>
+                        <Label htmlFor="tableNumber">Choose table</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <div className="flex items-center gap-4">
-                            <div>{field.value}</div>
+                            <div>{value}</div>
                             <TablesDialog
                               onChoose={(table) => {
-                                field.onChange(table.number);
+                                onChange(table.number);
                               }}
                             />
                           </div>
