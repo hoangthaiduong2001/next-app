@@ -3,6 +3,7 @@ import { authApiRequest } from "@/apiRequest/auth";
 import envConfig from "@/config";
 import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
 import { toast } from "@/hooks/useToast";
+import { TokenPayload } from "@/types/auth";
 import { clsx, type ClassValue } from "clsx";
 import { format } from "date-fns";
 import jwt from "jsonwebtoken";
@@ -35,6 +36,7 @@ export const handleErrorApi = ({
   setError?: UseFormSetError<any>;
   duration?: number;
 }) => {
+  console.log("errorerror", error);
   if (error instanceof EntityError && setError) {
     error.response.errors.forEach((item) => {
       setError(item.field, {
@@ -44,8 +46,8 @@ export const handleErrorApi = ({
     });
   } else {
     toast({
-      title: "Lỗi",
-      description: error?.payload?.message ?? "Lỗi không xác định",
+      title: "Error",
+      description: error?.response?.message ?? "Unknown error",
       variant: "destructive",
       duration: duration ?? 5000,
     });
@@ -59,14 +61,8 @@ export const handleCheckAndRefreshToken = async (param?: {
   const accessToken = getAccessTokenFromLocalStorage();
   const refreshToken = getRefreshTokenFromLocalStorage();
   if (!accessToken || !refreshToken) return;
-  const decodeAccessToken = jwt.decode(accessToken) as {
-    exp: number;
-    iat: number;
-  };
-  const decodeRefreshToken = jwt.decode(refreshToken) as {
-    exp: number;
-    iat: number;
-  };
+  const decodeAccessToken = decodeToken(accessToken);
+  const decodeRefreshToken = decodeToken(refreshToken);
   const now = new Date().getTime() / 1000 - 1;
   if (decodeRefreshToken.exp <= now) {
     removeTokenFromLocalStorage();
@@ -176,4 +172,8 @@ export const OrderStatusIcon = {
   [OrderStatus.Rejected]: BookX,
   [OrderStatus.Delivered]: Truck,
   [OrderStatus.Paid]: HandCoins,
+};
+
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload;
 };
