@@ -36,7 +36,6 @@ export const handleErrorApi = ({
   setError?: UseFormSetError<any>;
   duration?: number;
 }) => {
-  console.log("errorerror", error);
   if (error instanceof EntityError && setError) {
     error.response.errors.forEach((item) => {
       setError(item.field, {

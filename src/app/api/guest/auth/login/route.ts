@@ -1,5 +1,4 @@
 import { guestApiRequest } from "@/apiRequest/guest";
-import { HTTP_STATUS } from "@/constants/status";
 import { GuestLoginBodyType } from "@/schemaValidations/guest.schema";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
@@ -28,13 +27,13 @@ export async function POST(request: Request) {
     });
     return Response.json(response);
   } catch (error) {
-    console.log("error", error);
+    console.log("error12345", error);
     return Response.json(
       {
-        message: (error as any).message ?? "Error login in client",
+        message: (error as any).response.message ?? "Error login in client",
       },
       {
-        status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        status: (error as any).response.statusCode,
       }
     );
   }
