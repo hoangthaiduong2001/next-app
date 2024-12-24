@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 const LogoutPage = () => {
   const { mutateAsync } = useLogoutMutation();
   const router = useRouter();
-  const { setIsAuth } = useAppContext();
+  const { setRole } = useAppContext();
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get(REFRESH_TOKEN);
   const ref = useRef<any>(null);
@@ -25,14 +25,14 @@ const LogoutPage = () => {
         setTimeout(() => {
           ref.current = null;
         }, 1000);
-        setIsAuth(false);
+        setRole();
         router.push("/login");
         router.refresh();
       });
     } else {
       router.push("/");
     }
-  }, [router, mutateAsync, refreshTokenFromUrl, setIsAuth]);
+  }, [router, mutateAsync, refreshTokenFromUrl, setRole]);
   return <div>page</div>;
 };
 

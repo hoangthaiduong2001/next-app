@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { authApiRequest } from "@/apiRequest/auth";
+import { guestApiRequest } from "@/apiRequest/guest";
 import envConfig from "@/config";
-import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
+import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
 import { toast } from "@/hooks/useToast";
 import { TokenPayload } from "@/types/auth";
 import { clsx, type ClassValue } from "clsx";
@@ -36,7 +37,6 @@ export const handleErrorApi = ({
   setError?: UseFormSetError<any>;
   duration?: number;
 }) => {
-  console.log("errorerror", error);
   if (error instanceof EntityError && setError) {
     error.response.errors.forEach((item) => {
       setError(item.field, {
@@ -73,7 +73,11 @@ export const handleCheckAndRefreshToken = async (param?: {
     (decodeAccessToken.exp - decodeAccessToken.iat) / 3
   ) {
     try {
-      const res = await authApiRequest.clientRefreshToken();
+      const role = decodeRefreshToken.role;
+      const res =
+        role === Role.Guest
+          ? await guestApiRequest.clientRefreshToken()
+          : await authApiRequest.clientRefreshToken();
       setAccessTokenToLocalStorage(res.response.data.accessToken);
       setRefreshTokenToLocalStorage(res.response.data.refreshToken);
       param?.onSuccess && param.onSuccess();

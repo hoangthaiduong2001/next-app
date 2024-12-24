@@ -104,11 +104,13 @@ const request = async <Response>(
   }
   if (isClient) {
     const normalizeUrl = normalizePath(url);
-    if (normalizeUrl === "api/auth/login") {
+    if (["api/auth/login", "api/guest/auth/login"].includes(normalizeUrl)) {
       const { accessToken, refreshToken } = (response as LoginResType).data;
       localStorage.setItem(ACCESS_TOKEN, accessToken);
       localStorage.setItem(REFRESH_TOKEN, refreshToken);
-    } else if (normalizeUrl === "api/auth/logout") {
+    } else if (
+      ["api/auth/logout", "api/guest/auth/logout"].includes(normalizeUrl)
+    ) {
       localStorage.removeItem(ACCESS_TOKEN);
       localStorage.removeItem(REFRESH_TOKEN);
     }

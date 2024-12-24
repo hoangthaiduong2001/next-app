@@ -41,7 +41,6 @@ export default function GuestLoginForm() {
         route.push("/guest/menu");
       },
       onError: (error) => {
-        console.log("error", error);
         handleErrorApi({
           error,
           setError,

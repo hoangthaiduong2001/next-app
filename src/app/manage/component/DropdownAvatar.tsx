@@ -22,13 +22,13 @@ export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const route = useRouter();
   const { data } = useGetProfileMe();
-  const { setIsAuth } = useAppContext();
+  const { setRole } = useAppContext();
   const account = data?.response.data;
   const handleLogout = async () => {
     if (logoutMutation.isPending) return;
     try {
       const result = await logoutMutation.mutateAsync();
-      setIsAuth(false);
+      setRole();
       route.push("/");
       route.refresh();
       toast({ description: result.response.message });

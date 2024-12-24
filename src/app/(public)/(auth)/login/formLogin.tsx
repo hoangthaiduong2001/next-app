@@ -26,10 +26,10 @@ import { initLoginValue } from "./const";
 export default function LoginForm() {
   const route = useRouter();
   const searchParams = useSearchParams();
-  const { setIsAuth } = useAppContext();
+  const { setRole } = useAppContext();
   const clearTokens = searchParams.get("clearTokens");
   const [isHide, setIsHide] = useState<boolean>(true);
-  const loginMutation = useLoginMutation();
+  const { mutate: login, status } = useLoginMutation();
   const loginForm = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: initLoginValue,
@@ -37,27 +37,29 @@ export default function LoginForm() {
 
   const { setError, handleSubmit, control } = loginForm;
 
-  const onSubmit = async (data: LoginBodyType) => {
-    if (loginMutation.isPending) return;
-    try {
-      const result = await loginMutation.mutateAsync(data);
-      toast({ description: result.response.message });
-      setIsAuth(true);
-      route.push(pathApp.home);
-      route.refresh();
-    } catch (error) {
-      handleErrorApi({
-        error,
-        setError,
-      });
-    }
+  const onSubmit = async (value: LoginBodyType) => {
+    if (status === "pending") return;
+    login(value, {
+      onSuccess: (data) => {
+        toast({ description: data.response.message });
+        setRole(data.response.data.account.role);
+        route.push(pathApp.home);
+        route.refresh();
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError,
+        });
+      },
+    });
   };
 
   useEffect(() => {
     if (clearTokens) {
-      setIsAuth(false);
+      setRole();
     }
-  }, [clearTokens, setIsAuth]);
+  }, [clearTokens, setRole]);
 
   return (
     <Card className="mx-auto max-w-sm">
