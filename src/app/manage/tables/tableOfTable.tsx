@@ -18,17 +18,8 @@ import {
 import AddTable from "@/app/manage/tables/addTable";
 import EditTable from "@/app/manage/tables/editTable";
 import AutoPagination from "@/components/component/autoPagination";
+import CommonAlertDialog from "@/components/component/CommonAlertDialog";
 import QrCodeTable from "@/components/component/QrCodeTable";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alertDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -143,59 +134,6 @@ export const columns: ColumnDef<TableItem>[] = [
   },
 ];
 
-function AlertDialogDeleteTable({
-  tableDelete,
-  setTableDelete,
-}: {
-  tableDelete: TableItem | null;
-  setTableDelete: (value: TableItem | null) => void;
-}) {
-  const { mutate: deleteTable } = useDeleteTable();
-  const handleDeleteTable = () => {
-    if (tableDelete) {
-      deleteTable(tableDelete.number, {
-        onSuccess: (data) => {
-          setTableDelete(null);
-          toast({
-            title: data.response.message,
-          });
-        },
-        onError: (error) => {
-          handleErrorApi({ error });
-        },
-      });
-    }
-  };
-  return (
-    <AlertDialog
-      open={Boolean(tableDelete)}
-      onOpenChange={(value) => {
-        if (!value) {
-          setTableDelete(null);
-        }
-      }}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete table?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Table{" "}
-            <span className="bg-foreground text-primary-foreground rounded px-1">
-              {tableDelete?.number}
-            </span>{" "}
-            will be permanently deleted
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteTable}>
-            Continue
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10;
 export default function TableOfTable() {
@@ -206,6 +144,7 @@ export default function TableOfTable() {
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>();
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null);
   const listTable = useGetListTable();
+  const { mutate: deleteTable } = useDeleteTable();
   const data = listTable.data?.response.data || [];
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -238,6 +177,22 @@ export default function TableOfTable() {
     },
   });
 
+  const handleDeleteTable = () => {
+    if (tableDelete) {
+      deleteTable(tableDelete.number, {
+        onSuccess: (data) => {
+          setTableDelete(null);
+          toast({
+            title: data.response.message,
+          });
+        },
+        onError: (error) => {
+          handleErrorApi({ error });
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -251,9 +206,11 @@ export default function TableOfTable() {
     >
       <div className="w-full">
         <EditTable id={tableIdEdit} setId={setTableIdEdit} />
-        <AlertDialogDeleteTable
-          tableDelete={tableDelete}
-          setTableDelete={setTableDelete}
+        <CommonAlertDialog<TableItem>
+          name="Table"
+          objectDelete={tableDelete}
+          setObjectDelete={setTableDelete}
+          handleSubmit={handleDeleteTable}
         />
         <div className="flex items-center py-4">
           <Input

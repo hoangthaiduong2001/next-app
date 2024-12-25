@@ -19,16 +19,7 @@ import { Button } from "@/components/ui/button";
 import AddEmployee from "@/app/manage/accounts/addAccount";
 import EditEmployee from "@/app/manage/accounts/editAccount";
 import AutoPagination from "@/components/component/autoPagination";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alertDialog";
+import CommonAlertDialog from "@/components/component/CommonAlertDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -57,15 +48,15 @@ import { PAGE_SIZE } from "./const";
 import { AccountItem } from "./type";
 
 const AccountTableContext = createContext<{
-  setEmployeeIdEdit: (value: number) => void;
-  employeeIdEdit: number | undefined;
-  employeeDelete: AccountItem | null;
-  setEmployeeDelete: (value: AccountItem | null) => void;
+  setAccountIdEdit: (value: number) => void;
+  accountIdEdit: number | undefined;
+  accountDelete: AccountItem | null;
+  setAccountDelete: (value: AccountItem | null) => void;
 }>({
-  setEmployeeIdEdit: (value: number | undefined) => {},
-  employeeIdEdit: undefined,
-  employeeDelete: null,
-  setEmployeeDelete: (value: AccountItem | null) => {},
+  setAccountIdEdit: (value: number | undefined) => {},
+  accountIdEdit: undefined,
+  accountDelete: null,
+  setAccountDelete: (value: AccountItem | null) => {},
 });
 
 export const columns: ColumnDef<AccountType>[] = [
@@ -125,14 +116,14 @@ export const columns: ColumnDef<AccountType>[] = [
     id: "actions",
     enableHiding: false,
     cell: function Actions({ row }) {
-      const { setEmployeeIdEdit, setEmployeeDelete } =
+      const { setAccountIdEdit, setAccountDelete } =
         useContext(AccountTableContext);
       const openEditEmployee = () => {
-        setEmployeeIdEdit(row.original.id);
+        setAccountIdEdit(row.original.id);
       };
 
       const openDeleteEmployee = () => {
-        setEmployeeDelete(row.original);
+        setAccountDelete(row.original);
       };
       return (
         <DropdownMenu>
@@ -158,72 +149,16 @@ export const columns: ColumnDef<AccountType>[] = [
   },
 ];
 
-function AlertDialogDeleteAccount({
-  employeeDelete,
-  setEmployeeDelete,
-}: {
-  employeeDelete: AccountItem | null;
-  setEmployeeDelete: (value: AccountItem | null) => void;
-}) {
-  const { mutate: deleteAccount } = useDeleteAccount();
-  const handleDeleteAccount = () => {
-    if (employeeDelete) {
-      deleteAccount(employeeDelete.id, {
-        onSuccess: (data) => {
-          setEmployeeDelete(null);
-          toast({
-            title: data.response.message,
-          });
-        },
-        onError: (error) => {
-          handleErrorApi({
-            error,
-          });
-        },
-      });
-    }
-  };
-  return (
-    <AlertDialog
-      open={Boolean(employeeDelete)}
-      onOpenChange={(value) => {
-        if (!value) {
-          setEmployeeDelete(null);
-        }
-      }}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete employee?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Account{" "}
-            <span className="bg-foreground text-primary-foreground rounded px-1">
-              {employeeDelete?.name}
-            </span>{" "}
-            will be permanently deleted
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteAccount}>
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
 // Số lượng item trên 1 trang
 export default function AccountTable() {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
   const pageIndex = page - 1;
   // const params = Object.fromEntries(searchParam.entries())
-  const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>();
-  const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(
-    null
-  );
+  const [accountIdEdit, setAccountIdEdit] = useState<number | undefined>();
+  const [accountDelete, setAccountDelete] = useState<AccountItem | null>(null);
   const accountList = useGetListAccount();
+  const { mutate: deleteAccount } = useDeleteAccount();
   const data = accountList.data?.response.data ?? [];
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -256,6 +191,24 @@ export default function AccountTable() {
     },
   });
 
+  const handleDeleteAccount = () => {
+    if (accountDelete) {
+      deleteAccount(accountDelete.id, {
+        onSuccess: (data) => {
+          setAccountDelete(null);
+          toast({
+            title: data.response.message,
+          });
+        },
+        onError: (error) => {
+          handleErrorApi({
+            error,
+          });
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -266,21 +219,23 @@ export default function AccountTable() {
   return (
     <AccountTableContext.Provider
       value={{
-        employeeIdEdit,
-        setEmployeeIdEdit,
-        employeeDelete,
-        setEmployeeDelete,
+        accountIdEdit,
+        setAccountIdEdit,
+        accountDelete,
+        setAccountDelete,
       }}
     >
       <div className="w-full">
         <EditEmployee
-          id={employeeIdEdit}
-          setId={setEmployeeIdEdit}
+          id={accountIdEdit}
+          setId={setAccountIdEdit}
           onSubmitSuccess={() => {}}
         />
-        <AlertDialogDeleteAccount
-          employeeDelete={employeeDelete}
-          setEmployeeDelete={setEmployeeDelete}
+        <CommonAlertDialog<AccountItem>
+          name="Dish"
+          objectDelete={accountDelete}
+          setObjectDelete={setAccountDelete}
+          handleSubmit={handleDeleteAccount}
         />
         <div className="flex items-center py-4">
           <Input

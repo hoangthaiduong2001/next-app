@@ -18,16 +18,7 @@ import {
 import AddDish from "@/app/manage/dishes/addDish";
 import EditDish from "@/app/manage/dishes/editDish";
 import AutoPagination from "@/components/component/autoPagination";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alertDialog";
+import CommonAlertDialog from "@/components/component/CommonAlertDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -161,65 +152,12 @@ export const columns: ColumnDef<DishItem>[] = [
   },
 ];
 
-function AlertDialogDeleteDish({
-  dishDelete,
-  setDishDelete,
-}: {
-  dishDelete: DishItem | null;
-  setDishDelete: (value: DishItem | null) => void;
-}) {
-  const { mutate: deleteDish } = useDeleteDish();
-  const handleDeleteDish = () => {
-    if (dishDelete) {
-      deleteDish(dishDelete.id, {
-        onSuccess: (data) => {
-          setDishDelete(null);
-          toast({
-            title: data.response.message,
-          });
-        },
-        onError: (error) => {
-          handleErrorApi({ error });
-        },
-      });
-    }
-  };
-  return (
-    <AlertDialog
-      open={Boolean(dishDelete)}
-      onOpenChange={(value) => {
-        if (!value) {
-          setDishDelete(null);
-        }
-      }}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete dish?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Dish{" "}
-            <span className="bg-foreground text-primary-foreground rounded px-1">
-              {dishDelete?.name}
-            </span>{" "}
-            will be permanently deleted
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteDish}>
-            Continue
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
-
 export default function DishTable() {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
   const pageIndex = page - 1;
   const dishList = useGetListDish();
+  const { mutate: deleteDish } = useDeleteDish();
   const data = dishList.data?.response.data || [];
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>();
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null);
@@ -254,6 +192,22 @@ export default function DishTable() {
     },
   });
 
+  const handleDeleteDish = () => {
+    if (dishDelete) {
+      deleteDish(dishDelete.id, {
+        onSuccess: (data) => {
+          setDishDelete(null);
+          toast({
+            title: data.response.message,
+          });
+        },
+        onError: (error) => {
+          handleErrorApi({ error });
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -267,9 +221,11 @@ export default function DishTable() {
     >
       <div className="w-full">
         <EditDish id={dishIdEdit} setId={setDishIdEdit} />
-        <AlertDialogDeleteDish
-          dishDelete={dishDelete}
-          setDishDelete={setDishDelete}
+        <CommonAlertDialog<DishItem>
+          name="Dish"
+          objectDelete={dishDelete}
+          setObjectDelete={setDishDelete}
+          handleSubmit={handleDeleteDish}
         />
         <div className="flex items-center py-4">
           <Input
