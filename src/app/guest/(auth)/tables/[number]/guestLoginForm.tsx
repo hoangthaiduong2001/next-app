@@ -39,6 +39,7 @@ export default function GuestLoginForm() {
       onSuccess: (data) => {
         setRole(data.response.data.guest.role);
         route.push("/guest/menu");
+        route.refresh();
       },
       onError: (error) => {
         handleErrorApi({
