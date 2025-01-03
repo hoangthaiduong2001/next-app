@@ -1,4 +1,5 @@
 import { guestApiRequest } from "@/apiRequest/guest";
+import { GuestCreateOrdersBodyType } from "@/schemaValidations/guest.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useGuestLoginMutation = () => {
@@ -15,7 +16,9 @@ export const useGuestLogoutMutation = () => {
 
 export const useGuestOrderMutation = () => {
   return useMutation({
-    mutationFn: guestApiRequest.order,
+    mutationFn: (body: GuestCreateOrdersBodyType) => {
+      return guestApiRequest.order(body);
+    },
   });
 };
 
