@@ -80,6 +80,7 @@ export default function OrderGuestDetail({
                 width={30}
                 height={30}
                 className="h-[30px] w-[30px] rounded object-cover"
+                unoptimized
               />
               <span
                 className="truncate w-[70px] sm:w-[100px]"

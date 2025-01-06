@@ -105,6 +105,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
               width={50}
               height={50}
               className="rounded-md object-cover w-[50px] h-[50px] cursor-pointer"
+              unoptimized
             />
           </PopoverTrigger>
           <PopoverContent>
@@ -115,6 +116,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
                 width={100}
                 height={100}
                 className="rounded-md object-cover w-[100px] h-[100px]"
+                unoptimized
               />
               <div className="space-y-1 text-sm">
                 <h3 className="font-semibold">

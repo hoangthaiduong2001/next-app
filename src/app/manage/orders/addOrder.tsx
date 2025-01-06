@@ -192,6 +192,7 @@ export default function AddOrder() {
                   width={100}
                   quality={100}
                   className="object-cover w-[80px] h-[80px] rounded-md"
+                  unoptimized
                 />
               </div>
               <div className="space-y-1">
