@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, getVietnameseOrderStatus } from "@/config/utils";
 import { useGuestGetOrderList } from "@/hooks/useGuest";
+import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
 import { UpdateOrderResType } from "@/schemaValidations/order.schema";
 import Image from "next/image";
@@ -30,7 +31,15 @@ const OrdersCart = () => {
     }
 
     function onUpdateOrder(data: UpdateOrderResType["data"]) {
-      console.log(data);
+      const {
+        dishSnapshot: { name },
+        quantity,
+      } = data;
+      toast({
+        description: `Dish ${name} updated quantity: ${quantity} with status "${getVietnameseOrderStatus(
+          data.status
+        )}"`,
+      });
       refetch();
     }
 

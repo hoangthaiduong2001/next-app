@@ -11,7 +11,7 @@ const configProject = configSchema.safeParse({
 });
 if (!configProject.success) {
   console.error(configProject.error.issues);
-  throw new Error("Các giá trị khai báo trong file .env không hợp lệ");
+  throw new Error("The declared values in the .env file are invalid.");
 }
 
 const envConfig = configProject.data;
