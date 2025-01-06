@@ -134,11 +134,11 @@ export function DishesDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Thay đổi</Button>
+        <Button variant="outline">Change</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Chọn món ăn</DialogTitle>
+          <DialogTitle>Choose dish</DialogTitle>
         </DialogHeader>
         <div>
           <div className="w-full">

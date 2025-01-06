@@ -10,7 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { GetOrdersResType } from "@/schemaValidations/order.schema";
+import {
+  GetOrdersResType,
+  UpdateOrderResType,
+} from "@/schemaValidations/order.schema";
 import {
   ColumnFiltersState,
   SortingState,
@@ -49,6 +52,9 @@ import AutoPagination from "@/components/component/autoPagination";
 import { cn, getVietnameseOrderStatus } from "@/config/utils";
 import { useGetOrderListQuery } from "@/hooks/useOrder";
 import { useGetListTable } from "@/hooks/useTable";
+import { toast } from "@/hooks/useToast";
+import socket from "@/lib/socket";
+import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
 import TableSkeleton from "./tableSkeleton";
 
 export const OrderTableContext = createContext({
@@ -86,6 +92,7 @@ export default function OrderTable() {
   const pageIndex = page - 1;
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>();
   const getOrderListQuery = useGetOrderListQuery({ fromDate, toDate });
+  const orderListRefetch = getOrderListQuery.refetch;
   const getTableList = useGetListTable();
   const orderList = getOrderListQuery.data?.response.data ?? [];
   const tableList = getTableList.data?.response.data ?? [];
@@ -131,6 +138,11 @@ export default function OrderTable() {
     },
   });
 
+  const resetDateFilter = () => {
+    setFromDate(initFromDate);
+    setToDate(initToDate);
+  };
+
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -138,10 +150,59 @@ export default function OrderTable() {
     });
   }, [table, pageIndex]);
 
-  const resetDateFilter = () => {
-    setFromDate(initFromDate);
-    setToDate(initToDate);
-  };
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect();
+    }
+
+    function onConnect() {
+      console.log(socket.id);
+    }
+
+    function onDisconnect() {
+      console.log("disconnect");
+    }
+
+    function refetch() {
+      const now = new Date();
+      if (now >= fromDate && now <= toDate) {
+        orderListRefetch();
+      }
+    }
+
+    function onUpdateOrder(data: UpdateOrderResType["data"]) {
+      const {
+        dishSnapshot: { name },
+        quantity,
+      } = data;
+      toast({
+        description: `Dish ${name} updated quantity: ${quantity} with status "${getVietnameseOrderStatus(
+          data.status
+        )}"`,
+      });
+      refetch();
+    }
+
+    function onNewOrder(data: GuestCreateOrdersResType["data"]) {
+      const { guest } = data[0];
+      toast({
+        description: `${guest?.name} at table ${guest?.tableNumber} reversed`,
+      });
+      refetch();
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("update-order", onUpdateOrder);
+    socket.on("new-order", onNewOrder);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("update-order", onUpdateOrder);
+      socket.off("new-order", onNewOrder);
+    };
+  }, [orderListRefetch]);
 
   return (
     <OrderTableContext.Provider
