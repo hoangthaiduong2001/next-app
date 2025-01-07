@@ -1,3 +1,4 @@
+import { IPlainObject } from "@/types/common";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,18 +10,18 @@ import {
   AlertDialogTitle,
 } from "../ui/alertDialog";
 
-type CommonAlertDialogProps<T> = {
-  objectDelete: T | null;
-  setObjectDelete: (value: T | null) => void;
+type CommonAlertDialogProps<T extends IPlainObject> = {
+  itemDelete: T | null;
+  setItemDelete: (value: T | null) => void;
   handleSubmit: () => void;
   name: string;
   labelCancel?: string;
   labelSubmit?: string;
 };
 
-const CommonAlertDialog = <T extends object>({
-  objectDelete,
-  setObjectDelete,
+const CommonAlertDialog = <T extends IPlainObject>({
+  itemDelete,
+  setItemDelete,
   handleSubmit,
   name,
   labelCancel = "Cancel",
@@ -28,10 +29,10 @@ const CommonAlertDialog = <T extends object>({
 }: CommonAlertDialogProps<T>) => {
   return (
     <AlertDialog
-      open={Boolean(objectDelete)}
+      open={Boolean(itemDelete)}
       onOpenChange={(value) => {
         if (!value) {
-          setObjectDelete(null);
+          setItemDelete(null);
         }
       }}
     >
