@@ -223,8 +223,8 @@ export default function DishTable() {
         <EditDish id={dishIdEdit} setId={setDishIdEdit} />
         <CommonAlertDialog<DishItem>
           name="Dish"
-          objectDelete={dishDelete}
-          setObjectDelete={setDishDelete}
+          itemDelete={dishDelete}
+          setItemDelete={setDishDelete}
           handleSubmit={handleDeleteDish}
         />
         <div className="flex items-center py-4">
