@@ -10,14 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdownMenu";
-import { formatCurrency, getVietnameseDishStatus } from "@/config/utils";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { AccountType } from "@/schemaValidations/account.schema";
+import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import { useContext } from "react";
-import { DishTableContext } from "./const";
-import { DishItem } from "./type";
+import { AccountTableContext } from "./const";
 
-export const columnsDish: ColumnDef<DishItem>[] = [
+export const columnsAccount: ColumnDef<AccountType>[] = [
   {
     accessorKey: "id",
     header: "ID",
@@ -26,12 +25,12 @@ export const columnsDish: ColumnDef<DishItem>[] = [
     ),
   },
   {
-    accessorKey: "image",
-    header: "Image",
+    accessorKey: "avatar",
+    header: "Avatar",
     cell: ({ row }) => (
       <div className="flex justify-center">
-        <Avatar className="aspect-square text-center w-[100px] h-[100px] rounded-md object-cover">
-          <AvatarImage src={row.getValue("image")} />
+        <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
+          <AvatarImage src={row.getValue("avatar")} />
           <AvatarFallback className="rounded-none">
             {row.original.name}
           </AvatarFallback>
@@ -47,43 +46,39 @@ export const columnsDish: ColumnDef<DishItem>[] = [
     ),
   },
   {
-    accessorKey: "price",
-    header: "Price",
+    accessorKey: "role",
+    header: "Role",
     cell: ({ row }) => (
-      <div className="capitalize text-center">
-        {formatCurrency(row.getValue("price"))}
-      </div>
+      <div className="capitalize text-center">{row.getValue("role")}</div>
     ),
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "email",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div
-        dangerouslySetInnerHTML={{ __html: row.getValue("description") }}
-        className="whitespace-pre-line text-center"
-      />
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div className="text-center">
-        {getVietnameseDishStatus(row.getValue("status"))}
-      </div>
+      <div className="text-center">{row.getValue("email")}</div>
     ),
   },
   {
     id: "actions",
     enableHiding: false,
     cell: function Actions({ row }) {
-      const { setItemIdEdit, setItemDelete } = useContext(DishTableContext);
-      const openEditDish = () => {
+      const { setItemIdEdit, setItemDelete } = useContext(AccountTableContext);
+      const openEditEmployee = () => {
         setItemIdEdit(row.original.id);
       };
 
-      const openDeleteDish = () => {
+      const openDeleteEmployee = () => {
         setItemDelete(row.original);
       };
       return (
@@ -97,8 +92,12 @@ export const columnsDish: ColumnDef<DishItem>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={openEditDish}>Update</DropdownMenuItem>
-            <DropdownMenuItem onClick={openDeleteDish}>Delete</DropdownMenuItem>
+            <DropdownMenuItem onClick={openEditEmployee}>
+              Update
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={openDeleteEmployee}>
+              Delete
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

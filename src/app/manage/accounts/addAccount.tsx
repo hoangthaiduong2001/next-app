@@ -27,7 +27,7 @@ import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { defaultValueAddAccount } from "./const";
 
-export default function AddEmployee() {
+export default function AddAccount() {
   const [file, setFile] = useState<File | null>(null);
   const [open, setOpen] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);

@@ -25,13 +25,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { EditEmployeeType } from "./type";
+import { TEditEmployee } from "./type";
 
-export default function EditEmployee({
+export default function EditAccount({
   id,
   setId,
   onSubmitSuccess,
-}: EditEmployeeType) {
+}: TEditEmployee) {
   const [file, setFile] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const { data } = useGetAccountById({
