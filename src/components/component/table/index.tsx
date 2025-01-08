@@ -9,6 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { handleErrorApi } from "@/config/utils";
+import { toast } from "@/hooks/useToast";
 import { IPlainObject } from "@/types/common";
 import {
   ColumnFiltersState,
@@ -22,33 +24,23 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
-import { createContext, useState } from "react";
+import { useEffect, useState } from "react";
 import AutoPagination from "../autoPagination";
 import CommonAlertDialog from "../CommonAlertDialog";
 import { PAGE_SIZE } from "./const";
 import { TTableProps } from "./type";
 
-interface IItemTableContext<T extends IPlainObject> {
-  setItemIdEdit: (value: number | undefined) => void;
-  itemIdEdit: number | undefined;
-  itemDelete: T | null;
-  setItemDelete: (value: T | null) => void;
-}
-
-const ItemTableContext = createContext<IItemTableContext<IPlainObject>>({
-  setItemIdEdit: () => {},
-  itemIdEdit: undefined,
-  itemDelete: null,
-  setItemDelete: () => {},
-});
-
 const CommonTable = <TRowDataType extends IPlainObject>({
+  data,
   columns,
+  tableContext,
+  mutationItem,
+  AddItem,
+  EditItem,
 }: TTableProps<TRowDataType>) => {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
   const pageIndex = page - 1;
-  const data: TRowDataType[] = [];
   const [itemIdEdit, setItemIdEdit] = useState<number | undefined>();
   const [itemDelete, setItemDelete] = useState<IPlainObject | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -80,17 +72,47 @@ const CommonTable = <TRowDataType extends IPlainObject>({
       pagination,
     },
   });
+
+  const handleDeleteItem = () => {
+    if (itemDelete) {
+      mutationItem(itemDelete.id, {
+        onSuccess: (data) => {
+          setItemDelete(null);
+          toast({
+            title: data.response.message,
+          });
+        },
+        onError: (error) => {
+          handleErrorApi({ error });
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    table.setPagination({
+      pageIndex,
+      pageSize: PAGE_SIZE,
+    });
+  }, [table, pageIndex]);
   return (
-    <ItemTableContext.Provider
-      value={{ itemIdEdit, itemDelete, setItemDelete, setItemIdEdit }}
+    <tableContext.Provider
+      value={
+        {
+          itemIdEdit,
+          itemDelete,
+          setItemDelete,
+          setItemIdEdit,
+        } as unknown as TRowDataType
+      }
     >
       <div className="w-full">
-        {/* <EditDish id={dishIdEdit} setId={setDishIdEdit} /> */}
+        <EditItem id={itemIdEdit} setId={setItemIdEdit} />
         <CommonAlertDialog<TRowDataType>
           name="Dish"
           itemDelete={itemDelete as TRowDataType}
           setItemDelete={setItemDelete}
-          handleSubmit={() => console.log("delete")}
+          handleSubmit={handleDeleteItem}
         />
         <div className="flex items-center py-4">
           <Input
@@ -101,9 +123,7 @@ const CommonTable = <TRowDataType extends IPlainObject>({
             }
             className="max-w-sm"
           />
-          <div className="ml-auto flex items-center gap-2">
-            {/* <AddDish /> */}
-          </div>
+          <div className="ml-auto flex items-center gap-2">{AddItem}</div>
         </div>
         <div className="rounded-md border">
           <Table>
@@ -169,7 +189,7 @@ const CommonTable = <TRowDataType extends IPlainObject>({
           </div>
         </div>
       </div>
-    </ItemTableContext.Provider>
+    </tableContext.Provider>
   );
 };
 
