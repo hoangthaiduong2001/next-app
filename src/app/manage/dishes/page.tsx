@@ -12,8 +12,9 @@ import { useDeleteDish, useGetListDish } from "@/hooks/useDish";
 import { Context, Suspense } from "react";
 import AddDish from "./addDish";
 import { columnsDish } from "./column";
-import { DishItem, DishTableContext } from "./const";
+import { DishTableContext } from "./const";
 import EditDish from "./editDish";
+import { DishItem } from "./type";
 
 export default function DishesPage() {
   const dishList = useGetListDish();
@@ -29,14 +30,15 @@ export default function DishesPage() {
           </CardHeader>
           <CardContent>
             <Suspense>
-              {/* <DishTable /> */}
               <CommonTable<DishItem>
-                AddItem={<AddDish />}
+                AddItem={AddDish}
                 EditItem={EditDish}
                 tableContext={DishTableContext as unknown as Context<DishItem>}
                 data={data}
                 columns={columnsDish}
                 mutationItem={deleteDish}
+                name="Dish"
+                pathname="/manage/dishes"
               />
             </Suspense>
           </CardContent>

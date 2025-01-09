@@ -1,4 +1,7 @@
+import { IItemTableContext } from "@/components/component/table/type";
 import { TableStatus } from "@/constants/type";
+import { createContext } from "react";
+import { TableItem } from "./type";
 
 export const defaultValueAddable = {
   number: 0,
@@ -11,3 +14,10 @@ export const defaultValueEditTable = {
   status: TableStatus.Hidden,
   changeToken: false,
 };
+
+export const TableContext = createContext<IItemTableContext<TableItem>>({
+  itemIdEdit: undefined,
+  itemDelete: null,
+  setItemIdEdit: (value: number | undefined) => {},
+  setItemDelete: (value: TableItem | null) => {},
+});

@@ -3,22 +3,30 @@ import { UseMutateFunction } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { Context } from "react";
 
+type TData<T> = {
+  status: number;
+  response: {
+    data: T;
+    message: string;
+  };
+};
+
+type TEditItem = {
+  id: number | undefined;
+  setId: (value: number | undefined) => void;
+  onSubmitSuccess?: () => void;
+};
+
 export type TTableProps<TRowDataType extends IPlainObject> = {
+  name: string;
+  pathname: string;
   columns: ColumnDef<TRowDataType>[];
   data: TRowDataType[];
   tableContext: Context<TRowDataType>;
   initRows?: TRowDataType[];
-  AddItem: React.ReactNode;
-  EditItem: React.ComponentType<{
-    id: number | undefined;
-    setId: (value: number | undefined) => void;
-  }>;
-  mutationItem: UseMutateFunction<
-    { status: number; response: { message: string; data: TRowDataType } },
-    Error,
-    number,
-    unknown
-  >;
+  AddItem: React.ComponentType;
+  EditItem: React.ComponentType<TEditItem>;
+  mutationItem: UseMutateFunction<TData<TRowDataType>, Error, number, unknown>;
 };
 
 export interface IItemTableContext<T extends IPlainObject> {

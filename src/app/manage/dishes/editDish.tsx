@@ -40,16 +40,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { TEditDish } from "./type";
 
-export default function EditDish({
-  id,
-  setId,
-  onSubmitSuccess,
-}: {
-  id?: number | undefined;
-  setId: (value: number | undefined) => void;
-  onSubmitSuccess?: () => void;
-}) {
+export default function EditDish({ id, setId, onSubmitSuccess }: TEditDish) {
   const [file, setFile] = useState<File | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { data } = useGetDishById({ id: Number(id) });

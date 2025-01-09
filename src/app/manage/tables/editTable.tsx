@@ -40,16 +40,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { TEditTable } from "./type";
 
-export default function EditTable({
-  id,
-  setId,
-  onSubmitSuccess,
-}: {
-  id?: number | undefined;
-  setId: (value: number | undefined) => void;
-  onSubmitSuccess?: () => void;
-}) {
+export default function EditTable({ id, setId, onSubmitSuccess }: TEditTable) {
   const { data } = useGetTableById({ id: Number(id) });
   const { mutate: updateTable, status } = useUpdateTable();
   const form = useForm<UpdateTableBodyType>({

@@ -37,6 +37,8 @@ const CommonTable = <TRowDataType extends IPlainObject>({
   mutationItem,
   AddItem,
   EditItem,
+  name,
+  pathname,
 }: TTableProps<TRowDataType>) => {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
@@ -75,7 +77,7 @@ const CommonTable = <TRowDataType extends IPlainObject>({
 
   const handleDeleteItem = () => {
     if (itemDelete) {
-      mutationItem(itemDelete.id, {
+      mutationItem(name === "Table" ? itemDelete.number : itemDelete.id, {
         onSuccess: (data) => {
           setItemDelete(null);
           toast({
@@ -109,7 +111,7 @@ const CommonTable = <TRowDataType extends IPlainObject>({
       <div className="w-full">
         <EditItem id={itemIdEdit} setId={setItemIdEdit} />
         <CommonAlertDialog<TRowDataType>
-          name="Dish"
+          name={name}
           itemDelete={itemDelete as TRowDataType}
           setItemDelete={setItemDelete}
           handleSubmit={handleDeleteItem}
@@ -117,13 +119,19 @@ const CommonTable = <TRowDataType extends IPlainObject>({
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter name"
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            value={
+              name === "Table"
+                ? (table.getColumn("number")?.getFilterValue() as string)
+                : (table.getColumn("name")?.getFilterValue() as string) ?? ""
+            }
             onChange={(e) =>
-              table.getColumn("name")?.setFilterValue(e.target.value)
+              name === "Table"
+                ? table.getColumn("number")?.setFilterValue(e.target.value)
+                : table.getColumn("name")?.setFilterValue(e.target.value)
             }
             className="max-w-sm"
           />
-          <div className="ml-auto flex items-center gap-2">{AddItem}</div>
+          <div className="ml-auto flex items-center gap-2">{<AddItem />}</div>
         </div>
         <div className="rounded-md border">
           <Table>
@@ -184,7 +192,7 @@ const CommonTable = <TRowDataType extends IPlainObject>({
             <AutoPagination
               page={table.getState().pagination.pageIndex + 1}
               pageSize={table.getPageCount()}
-              pathname="/manage/dishes"
+              pathname={pathname}
             />
           </div>
         </div>
