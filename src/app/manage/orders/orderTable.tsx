@@ -1,7 +1,6 @@
 "use client";
 import AddOrder from "@/app/manage/orders/addOrder";
 import EditOrder from "@/app/manage/orders/editOrder";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -32,30 +31,20 @@ import { useOrderService } from "@/app/manage/orders/orderService";
 import OrderStatics from "@/app/manage/orders/orderStatics";
 import orderTableColumns from "@/app/manage/orders/orderTableColumns";
 import { OrderStatusValues } from "@/constants/type";
-import { Check, ChevronsUpDown } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { endOfDay, format, startOfDay } from "date-fns";
+import { endOfDay, startOfDay } from "date-fns";
 
 import AutoPagination from "@/components/component/autoPagination";
-import { cn, getVietnameseOrderStatus } from "@/config/utils";
+
+import TableSkeleton from "@/components/component/table/tableSkeleton";
+import { getVietnameseOrderStatus } from "@/config/utils";
 import { useGetOrderListQuery } from "@/hooks/useOrder";
 import { useGetListTable } from "@/hooks/useTable";
 import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
-import TableSkeleton from "./tableSkeleton";
+import DatePicker from "./component/DatePicker";
+import FilterTableOrder from "./component/FilterTableOrder";
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -138,11 +127,6 @@ export default function OrderTable() {
     },
   });
 
-  const resetDateFilter = () => {
-    setFromDate(initFromDate);
-    setToDate(initToDate);
-  };
-
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -220,111 +204,21 @@ export default function OrderTable() {
           onSubmitSuccess={() => {}}
         />
         <div className=" flex items-center">
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center">
-              <span className="mr-2">From</span>
-              <Input
-                type="datetime-local"
-                placeholder="From date"
-                className="text-sm"
-                value={format(fromDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
-                onChange={(event) => setFromDate(new Date(event.target.value))}
-              />
-            </div>
-            <div className="flex items-center">
-              <span className="mr-2">To</span>
-              <Input
-                type="datetime-local"
-                placeholder="To date"
-                value={format(toDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
-                onChange={(event) => setToDate(new Date(event.target.value))}
-              />
-            </div>
-            <Button className="" variant={"outline"} onClick={resetDateFilter}>
-              Reset
-            </Button>
-          </div>
+          <DatePicker
+            toDate={toDate}
+            fromDate={fromDate}
+            setToDate={setToDate}
+            setFromDate={setFromDate}
+          />
           <div className="ml-auto">
             <AddOrder />
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-4 py-4">
-          <Input
-            placeholder="Name guest"
-            value={
-              (table.getColumn("guestName")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("guestName")?.setFilterValue(event.target.value)
-            }
-            className="max-w-[100px]"
-          />
-          <Input
-            placeholder="ID"
-            value={
-              (table.getColumn("tableNumber")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("tableNumber")?.setFilterValue(event.target.value)
-            }
-            className="max-w-[80px]"
-          />
-          <Popover open={openStatusFilter} onOpenChange={setOpenStatusFilter}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={openStatusFilter}
-                className="w-[150px] text-sm justify-between"
-              >
-                {table.getColumn("status")?.getFilterValue()
-                  ? getVietnameseOrderStatus(
-                      table
-                        .getColumn("status")
-                        ?.getFilterValue() as (typeof OrderStatusValues)[number]
-                    )
-                  : "Status"}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandGroup>
-                  <CommandList>
-                    {OrderStatusValues.map((status) => (
-                      <CommandItem
-                        key={status}
-                        value={status}
-                        onSelect={(currentValue) => {
-                          table
-                            .getColumn("status")
-                            ?.setFilterValue(
-                              currentValue ===
-                                table.getColumn("status")?.getFilterValue()
-                                ? ""
-                                : currentValue
-                            );
-                          setOpenStatusFilter(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            table.getColumn("status")?.getFilterValue() ===
-                              status
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        {getVietnameseOrderStatus(status)}
-                      </CommandItem>
-                    ))}
-                  </CommandList>
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
+        <FilterTableOrder
+          table={table}
+          openStatusFilter={openStatusFilter}
+          setOpenStatusFilter={setOpenStatusFilter}
+        />
         <OrderStatics
           statics={statics}
           tableList={tableListSortedByNumber}

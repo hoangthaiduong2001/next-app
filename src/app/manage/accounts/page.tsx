@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useDeleteAccount, useGetListAccount } from "@/hooks/useAccount";
-import { Context, Suspense } from "react";
+import { Suspense } from "react";
 import AddAccount from "./addAccount";
 import { columnsAccount } from "./column";
 import { AccountTableContext } from "./const";
@@ -33,14 +33,14 @@ export default function Dashboard() {
               <CommonTable<AccountItem>
                 AddItem={AddAccount}
                 EditItem={EditAccount}
-                tableContext={
-                  AccountTableContext as unknown as Context<AccountItem>
-                }
+                tableContext={AccountTableContext}
                 data={data}
                 columns={columnsAccount}
                 mutationItem={deleteAccount}
+                queryListItem={accountList}
                 name="Account"
                 pathname="/manage/accounts"
+                filterName="name"
               />
             </Suspense>
           </CardContent>

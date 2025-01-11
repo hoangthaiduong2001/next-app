@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useDeleteTable, useGetListTable } from "@/hooks/useTable";
-import { Context, Suspense } from "react";
+import { Suspense } from "react";
 import AddTable from "./addTable";
 import { columnsTable } from "./column";
 import { TableContext } from "./const";
@@ -33,12 +33,15 @@ export default function TablesPage() {
               <CommonTable<TableItem>
                 AddItem={AddTable}
                 EditItem={EditTable}
-                tableContext={TableContext as unknown as Context<TableItem>}
+                tableContext={TableContext}
                 data={data}
                 columns={columnsTable}
                 mutationItem={deleteTable}
+                queryListItem={tableList}
                 name="Table"
                 pathname="/manage/tables"
+                filterName="number"
+                deleteById={false}
               />
             </Suspense>
           </CardContent>
