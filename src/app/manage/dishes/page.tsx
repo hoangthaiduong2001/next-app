@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useDeleteDish, useGetListDish } from "@/hooks/useDish";
-import { Context, Suspense } from "react";
+import { Suspense } from "react";
 import AddDish from "./addDish";
 import { columnsDish } from "./column";
 import { DishTableContext } from "./const";
@@ -33,12 +33,14 @@ export default function DishesPage() {
               <CommonTable<DishItem>
                 AddItem={AddDish}
                 EditItem={EditDish}
-                tableContext={DishTableContext as unknown as Context<DishItem>}
+                tableContext={DishTableContext}
                 data={data}
                 columns={columnsDish}
                 mutationItem={deleteDish}
+                queryListItem={dishList}
                 name="Dish"
                 pathname="/manage/dishes"
+                filterName="name"
               />
             </Suspense>
           </CardContent>

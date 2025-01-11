@@ -1,9 +1,9 @@
 import { IPlainObject } from "@/types/common";
-import { UseMutateFunction } from "@tanstack/react-query";
+import { UseMutateFunction, UseQueryResult } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { Context } from "react";
 
-type TData<T> = {
+export type TData<T> = {
   status: number;
   response: {
     data: T;
@@ -20,13 +20,17 @@ type TEditItem = {
 export type TTableProps<TRowDataType extends IPlainObject> = {
   name: string;
   pathname: string;
+  filterName: string;
+  deleteById?: boolean;
+  isOrder?: boolean;
   columns: ColumnDef<TRowDataType>[];
   data: TRowDataType[];
-  tableContext: Context<TRowDataType>;
+  tableContext: Context<IItemTableContext<TRowDataType>>;
   initRows?: TRowDataType[];
   AddItem: React.ComponentType;
   EditItem: React.ComponentType<TEditItem>;
   mutationItem: UseMutateFunction<TData<TRowDataType>, Error, number, unknown>;
+  queryListItem: UseQueryResult<TData<TRowDataType[]>, Error>;
 };
 
 export interface IItemTableContext<T extends IPlainObject> {

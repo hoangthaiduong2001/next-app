@@ -166,7 +166,7 @@ export default function AddOrder() {
               <div>
                 {selectedGuest.name} (#{selectedGuest.id})
               </div>
-              <div>Bàn: {selectedGuest.tableNumber}</div>
+              <div>Table: {selectedGuest.tableNumber}</div>
             </div>
           </div>
         )}
