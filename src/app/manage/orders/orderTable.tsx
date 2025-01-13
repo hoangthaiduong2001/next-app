@@ -27,9 +27,8 @@ import {
 import { useSearchParams } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
+import OrderStatics from "@/app/manage/orders/component/OrderStatics";
 import { useOrderService } from "@/app/manage/orders/orderService";
-import OrderStatics from "@/app/manage/orders/orderStatics";
-import orderTableColumns from "@/app/manage/orders/orderTableColumns";
 import { OrderStatusValues } from "@/constants/type";
 
 import { endOfDay, startOfDay } from "date-fns";
@@ -43,6 +42,7 @@ import { useGetListTable } from "@/hooks/useTable";
 import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
+import { columnDish, columnOrders } from "./column";
 import DatePicker from "./component/DatePicker";
 import FilterTableOrder from "./component/FilterTableOrder";
 
@@ -107,7 +107,7 @@ export default function OrderTable() {
 
   const table = useReactTable({
     data: orderList,
-    columns: orderTableColumns,
+    columns: columnOrders,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -267,7 +267,7 @@ export default function OrderTable() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={orderTableColumns.length}
+                      colSpan={columnDish.length}
                       className="h-24 text-center"
                     >
                       No results.
@@ -282,7 +282,7 @@ export default function OrderTable() {
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
             Display <strong>{table.getPaginationRowModel().rows.length}</strong>{" "}
-            in <strong>{orderList.length}</strong> result
+            in <strong>{columnOrders.length}</strong> result
           </div>
           <div>
             <AutoPagination

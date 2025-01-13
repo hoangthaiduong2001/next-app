@@ -1,5 +1,5 @@
 "use client";
-import { DishesDialog } from "@/app/manage/orders/dishesDialog";
+import { TableDish } from "@/app/manage/orders/tableDish";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -143,7 +143,7 @@ export default function EditOrder({
                       <div>{selectedDish?.name}</div>
                     </div>
 
-                    <DishesDialog
+                    <TableDish
                       onChoose={(dish) => {
                         field.onChange(dish.id);
                         setSelectedDish(dish);

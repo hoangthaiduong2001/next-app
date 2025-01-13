@@ -67,7 +67,7 @@ export const columnsTable: ColumnDef<TableItem>[] = [
       };
 
       const openDeleteTable = () => {
-        setItemDelete(row.original);
+        setItemDelete?.(row.original);
       };
       return (
         <DropdownMenu>

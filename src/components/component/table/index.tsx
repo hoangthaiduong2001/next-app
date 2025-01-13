@@ -2,9 +2,9 @@
 
 import DatePicker from "@/app/manage/orders/component/DatePicker";
 import FilterTableOrder from "@/app/manage/orders/component/FilterTableOrder";
-import { initFromDate, initToDate } from "@/app/manage/orders/const";
+import OrderStatics from "@/app/manage/orders/component/OrderStatics";
 import { useOrderService } from "@/app/manage/orders/orderService";
-import OrderStatics from "@/app/manage/orders/orderStatics";
+import { TDatePicker } from "@/app/manage/orders/type";
 import TableSkeleton from "@/components/component/table/tableSkeleton";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,8 +16,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { handleErrorApi } from "@/config/utils";
+import { TableStatus } from "@/constants/type";
 import { toast } from "@/hooks/useToast";
 import { GetOrdersResType } from "@/schemaValidations/order.schema";
+import { TableListResType } from "@/schemaValidations/table.schema";
 import { IPlainObject } from "@/types/common";
 import {
   ColumnFiltersState,
@@ -34,11 +36,14 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AutoPagination from "../autoPagination";
 import CommonAlertDialog from "../CommonAlertDialog";
-import { PAGE_SIZE } from "./const";
+import { changeStatus, PAGE_SIZE } from "./const";
 import { handleOrderSocket } from "./helper";
 import { IItemTableContext, TTableProps } from "./type";
 
-const CommonTable = <TRowDataType extends IPlainObject>({
+const CommonTable = <
+  TRowDataType extends IPlainObject,
+  TRowDataSort extends IPlainObject = object[]
+>({
   data,
   columns,
   tableContext,
@@ -51,15 +56,17 @@ const CommonTable = <TRowDataType extends IPlainObject>({
   deleteById = true,
   isOrder = false,
   queryListItem,
-}: TTableProps<TRowDataType>) => {
+  queryItemByDate,
+  tableListSortedByNumber,
+  onChoose,
+  setOpen,
+}: TTableProps<TRowDataType, TRowDataSort>) => {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
   const pageIndex = page - 1;
   const [itemIdEdit, setItemIdEdit] = useState<number | undefined>();
   const [openStatusFilter, setOpenStatusFilter] = useState(false);
   const [itemDelete, setItemDelete] = useState<IPlainObject | null>(null);
-  const [fromDate, setFromDate] = useState(initFromDate);
-  const [toDate, setToDate] = useState(initToDate);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -68,13 +75,11 @@ const CommonTable = <TRowDataType extends IPlainObject>({
     pageIndex,
     pageSize: PAGE_SIZE,
   });
-  const tableList = queryListItem.data?.response.data ?? [];
-  const tableListSortedByNumber = tableList.sort((a, b) => a.number - b.number);
+
+  const { fromDate, toDate, setFromDate, setToDate } =
+    (queryItemByDate as TDatePicker) ?? {};
   const { statics, orderObjectByGuestId, servingGuestByTableNumber } =
-    useOrderService(
-      (queryListItem.data?.response
-        .data as unknown as GetOrdersResType["data"]) ?? []
-    );
+    useOrderService(data as unknown as GetOrdersResType["data"]);
   const table = useReactTable({
     data,
     columns,
@@ -99,7 +104,7 @@ const CommonTable = <TRowDataType extends IPlainObject>({
 
   const handleDeleteItem = () => {
     if (itemDelete) {
-      mutationItem(deleteById ? itemDelete.id : itemDelete.number, {
+      mutationItem?.(deleteById ? itemDelete.id : itemDelete.number, {
         onSuccess: (data) => {
           setItemDelete(null);
           toast({
@@ -113,6 +118,12 @@ const CommonTable = <TRowDataType extends IPlainObject>({
     }
   };
 
+  // const choose = (value: TRowDataType) => {
+  //   console.log("value", value);
+  //   onChoose?.(value);
+  //   setOpen?.(false);
+  // };
+
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -121,11 +132,11 @@ const CommonTable = <TRowDataType extends IPlainObject>({
   }, [table, pageIndex]);
 
   useEffect(() => {
-    if (isOrder) {
+    if (isOrder && queryListItem) {
       handleOrderSocket<TRowDataType>(fromDate, toDate, queryListItem);
     }
     return;
-  }, [queryListItem.refetch]);
+  }, [queryListItem?.refetch]);
   return (
     <tableContext.Provider
       value={
@@ -134,6 +145,8 @@ const CommonTable = <TRowDataType extends IPlainObject>({
           itemDelete,
           setItemDelete,
           setItemIdEdit,
+          changeStatus,
+          orderObjectByGuestId,
         } as IItemTableContext<TRowDataType>
       }
     >
@@ -167,7 +180,9 @@ const CommonTable = <TRowDataType extends IPlainObject>({
             />
             <OrderStatics
               statics={statics}
-              tableList={tableListSortedByNumber as any}
+              tableList={
+                tableListSortedByNumber as unknown as TableListResType["data"]
+              }
               servingGuestByTableNumber={servingGuestByTableNumber}
             />
           </>
@@ -186,7 +201,7 @@ const CommonTable = <TRowDataType extends IPlainObject>({
             <div className="ml-auto flex items-center gap-2">{<AddItem />}</div>
           </div>
         )}
-        {queryListItem.isPending ? (
+        {queryListItem?.isPending ? (
           <TableSkeleton />
         ) : (
           <div className="rounded-md border">
@@ -215,6 +230,18 @@ const CommonTable = <TRowDataType extends IPlainObject>({
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
+                      onClick={
+                        onChoose
+                          ? () => {
+                              if (
+                                row.original.status === TableStatus.Available ||
+                                row.original.status === TableStatus.Reserved
+                              ) {
+                                onChoose?.(row.original);
+                              }
+                            }
+                          : undefined
+                      }
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
