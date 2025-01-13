@@ -23,7 +23,7 @@ const FilterTableOrder = <T,>({
   setOpenStatusFilter,
 }: TFilterTableOrder<T>) => {
   return (
-    <div className="flex flex-wrap items-center gap-4 py-4">
+    <div className="flex w-1/2 items-center gap-4 py-4">
       {filterValue.map((item) => (
         <Input
           key={item.id}

@@ -1,3 +1,6 @@
+import { TDatePicker } from "@/app/manage/orders/type";
+import { OrderStatusValues } from "@/constants/type";
+import { GetOrdersResType } from "@/schemaValidations/order.schema";
 import { IPlainObject } from "@/types/common";
 import { UseMutateFunction, UseQueryResult } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
@@ -17,7 +20,19 @@ type TEditItem = {
   onSubmitSuccess?: () => void;
 };
 
-export type TTableProps<TRowDataType extends IPlainObject> = {
+export type TChangeStatusOrder = {
+  orderId: number;
+  dishId: number;
+  status: (typeof OrderStatusValues)[number];
+  quantity: number;
+};
+
+export type OrderObjectByGuestID = Record<number, GetOrdersResType["data"]>;
+
+export type TTableProps<
+  TRowDataType extends IPlainObject,
+  TRowDataSort extends IPlainObject = object[]
+> = {
   name: string;
   pathname: string;
   filterName: string;
@@ -29,13 +44,18 @@ export type TTableProps<TRowDataType extends IPlainObject> = {
   initRows?: TRowDataType[];
   AddItem: React.ComponentType;
   EditItem: React.ComponentType<TEditItem>;
-  mutationItem: UseMutateFunction<TData<TRowDataType>, Error, number, unknown>;
-  queryListItem: UseQueryResult<TData<TRowDataType[]>, Error>;
+  mutationItem?: UseMutateFunction<TData<TRowDataType>, Error, number, unknown>;
+  queryListItem?: UseQueryResult<TData<TRowDataType[]>, Error>;
+  queryItemByDate?: TDatePicker;
+  tableListSortedByNumber?: TRowDataSort;
+  onChoose?: (value: TRowDataType) => void;
 };
 
 export interface IItemTableContext<T extends IPlainObject> {
   itemIdEdit: number | undefined;
-  itemDelete: T | null;
+  itemDelete?: T | null;
   setItemIdEdit: (value: number | undefined) => void;
-  setItemDelete: (value: T | null) => void;
+  setItemDelete?: (value: T | null) => void;
+  changeStatus?: (payload: TChangeStatusOrder) => void;
+  orderObjectByGuestId?: OrderObjectByGuestID;
 }

@@ -1,7 +1,7 @@
 "use client";
 import Quantity from "@/app/guest/menu/quantity";
 import GuestsDialog from "@/app/manage/orders/guestsDialog";
-import { TablesDialog } from "@/app/manage/orders/tablesDialog";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,6 +29,7 @@ import { PlusCircle } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { TablesOfTable } from "./tablesOfTable";
 
 export default function AddOrder() {
   const [open, setOpen] = useState(false);
@@ -137,7 +138,7 @@ export default function AddOrder() {
                         <div className="col-span-3 w-full space-y-2">
                           <div className="flex items-center gap-4">
                             <div>{value}</div>
-                            <TablesDialog
+                            <TablesOfTable
                               onChoose={(table) => {
                                 onChange(table.number);
                               }}
