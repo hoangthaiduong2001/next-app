@@ -1,9 +1,9 @@
-import OrderGuestDetail from "@/app/manage/orders/orderGuestDetail";
 import {
   ServingGuestByTableNumber,
   Statics,
   StatusCountObject,
-} from "@/app/manage/orders/orderTable";
+} from "@/app/manage/orders/component/orderTable";
+import OrderGuestDetail from "@/app/manage/orders/orderGuestDetail";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn, getVietnameseOrderStatus, OrderStatusIcon } from "@/config/utils";
+import { cn, OrderStatusIcon } from "@/config/utils";
 import { OrderStatus, OrderStatusValues } from "@/constants/type";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import { Users } from "lucide-react";
@@ -190,7 +190,7 @@ export default function OrderStatics({
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {getVietnameseOrderStatus(OrderStatus.Pending)}:{" "}
+                        {OrderStatus.Pending}:{" "}
                         {countObject[OrderStatus.Pending] ?? 0} order
                       </TooltipContent>
                     </Tooltip>
@@ -205,7 +205,7 @@ export default function OrderStatics({
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {getVietnameseOrderStatus(OrderStatus.Processing)}:{" "}
+                        {OrderStatus.Processing}:{" "}
                         {countObject[OrderStatus.Processing] ?? 0} order
                       </TooltipContent>
                     </Tooltip>
@@ -217,7 +217,7 @@ export default function OrderStatics({
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {getVietnameseOrderStatus(OrderStatus.Delivered)}:{" "}
+                        {OrderStatus.Delivered}:{" "}
                         {countObject[OrderStatus.Delivered] ?? 0} order
                       </TooltipContent>
                     </Tooltip>
@@ -231,7 +231,7 @@ export default function OrderStatics({
       <div className="flex justify-start items-end gap-4 flex-wrap py-4">
         {OrderStatusValues.map((status) => (
           <Badge variant="secondary" key={status}>
-            {getVietnameseOrderStatus(status)}: {statics.status[status] ?? 0}
+            {status}: {statics.status[status] ?? 0}
           </Badge>
         ))}
       </div>

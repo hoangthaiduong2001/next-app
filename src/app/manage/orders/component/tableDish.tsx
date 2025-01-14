@@ -10,9 +10,9 @@ import {
 import { useGetListDish } from "@/hooks/useDish";
 
 import { useState } from "react";
-import { columnDish } from "./column";
-import { DishTableContext } from "./const";
-import { TDish } from "./type";
+import { columnDish } from "../column";
+import { DishTableContext } from "../const";
+import { TDish } from "../type";
 
 export function TableDish({ onChoose }: { onChoose: (dish: TDish) => void }) {
   const [open, setOpen] = useState(false);

@@ -11,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn, getVietnameseOrderStatus } from "@/config/utils";
+import { cn } from "@/config/utils";
 import { OrderStatusValues } from "@/constants/type";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { filterValue } from "../const";
@@ -46,11 +46,9 @@ const FilterTableOrder = <T,>({
             className="w-[150px] text-sm justify-between"
           >
             {table.getColumn("status")?.getFilterValue()
-              ? getVietnameseOrderStatus(
-                  table
-                    .getColumn("status")
-                    ?.getFilterValue() as (typeof OrderStatusValues)[number]
-                )
+              ? (table
+                  .getColumn("status")
+                  ?.getFilterValue() as (typeof OrderStatusValues)[number])
               : "Status"}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -83,7 +81,7 @@ const FilterTableOrder = <T,>({
                           : "opacity-0"
                       )}
                     />
-                    {getVietnameseOrderStatus(status)}
+                    {status}
                   </CommandItem>
                 ))}
               </CommandList>

@@ -1,6 +1,5 @@
 "use client";
 import Quantity from "@/app/guest/menu/quantity";
-import GuestsDialog from "@/app/manage/orders/guestsDialog";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +28,8 @@ import { PlusCircle } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TablesOfTable } from "./tablesOfTable";
+import TableGuest from "./component/tableGuest";
+import { TablesOfTable } from "./component/tablesOfTable";
 
 export default function AddOrder() {
   const [open, setOpen] = useState(false);
@@ -154,7 +154,7 @@ export default function AddOrder() {
           </Form>
         )}
         {!isNewGuest && (
-          <GuestsDialog
+          <TableGuest
             onChoose={(guest) => {
               setSelectedGuest(guest);
             }}

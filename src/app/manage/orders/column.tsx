@@ -1,5 +1,3 @@
-"use client";
-
 import OrderGuestDetail from "@/app/manage/orders/orderGuestDetail";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,9 +24,6 @@ import {
 import {
   formatCurrency,
   formatDateTimeToLocaleString,
-  getVietnameseDishStatus,
-  getVietnameseOrderStatus,
-  getVietnameseTableStatus,
   simpleMatchText,
 } from "@/config/utils";
 import { OrderStatus, OrderStatusValues } from "@/constants/type";
@@ -37,7 +32,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { useContext } from "react";
 import { OrderTableContext } from "./const";
-import { TDish, TOrders, TTable } from "./type";
+import { TDish, TGuest, TOrders, TTable } from "./type";
 
 export const columnOrders: ColumnDef<TOrders>[] = [
   {
@@ -177,7 +172,7 @@ export const columnOrders: ColumnDef<TOrders>[] = [
             <SelectContent>
               {OrderStatusValues.map((status) => (
                 <SelectItem key={status} value={status}>
-                  {getVietnameseOrderStatus(status)}
+                  {status}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -269,9 +264,7 @@ export const columnDish: ColumnDef<TDish>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <div>{getVietnameseDishStatus(row.getValue("status"))}</div>
-    ),
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
   },
 ];
 
@@ -297,8 +290,48 @@ export const columnTable: ColumnDef<TTable>[] = [
   {
     accessorKey: "status",
     header: "Status",
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
+  },
+];
+
+export const columnGuest: ColumnDef<TGuest>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
     cell: ({ row }) => (
-      <div>{getVietnameseTableStatus(row.getValue("status"))}</div>
+      <div className="capitalize">
+        {row.getValue("name")} | (#{row.original.id})
+      </div>
+    ),
+    filterFn: (row, columnId, filterValue: string) => {
+      if (filterValue === undefined) return true;
+      return simpleMatchText(
+        row.original.name + String(row.original.id),
+        String(filterValue)
+      );
+    },
+  },
+  {
+    accessorKey: "tableNumber",
+    header: "ID",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("tableNumber")}</div>
+    ),
+    filterFn: (row, columnId, filterValue: string) => {
+      if (filterValue === undefined) return true;
+      return simpleMatchText(
+        String(row.original.tableNumber),
+        String(filterValue)
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: () => <div>Create</div>,
+    cell: ({ row }) => (
+      <div className="flex items-center space-x-4 text-sm">
+        {formatDateTimeToLocaleString(row.getValue("createdAt"))}
+      </div>
     ),
   },
 ];

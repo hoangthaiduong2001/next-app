@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   formatCurrency,
   formatDateTimeToLocaleString,
-  getVietnameseOrderStatus,
   OrderStatusIcon,
 } from "@/config/utils";
 import { OrderStatus } from "@/constants/type";
@@ -58,7 +57,7 @@ export default function OrderGuestDetail({
           return (
             <div key={order.id} className="flex gap-2 items-center text-xs">
               <span className="w-[10px]">{index + 1}</span>
-              <span title={getVietnameseOrderStatus(order.status)}>
+              <span title={order.status}>
                 {order.status === OrderStatus.Pending && (
                   <OrderStatusIcon.Pending className="w-4 h-4" />
                 )}

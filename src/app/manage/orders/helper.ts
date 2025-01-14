@@ -2,7 +2,7 @@ import {
   OrderObjectByGuestID,
   ServingGuestByTableNumber,
   Statics,
-} from "@/app/manage/orders/orderTable";
+} from "@/app/manage/orders/component/orderTable";
 import { OrderStatus } from "@/constants/type";
 import { GetOrdersResType } from "@/schemaValidations/order.schema";
 import { useMemo } from "react";

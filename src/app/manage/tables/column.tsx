@@ -8,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdownMenu";
-import { getVietnameseTableStatus } from "@/config/utils";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import { useContext } from "react";
@@ -38,9 +37,7 @@ export const columnsTable: ColumnDef<TableItem>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="text-center">
-        {getVietnameseTableStatus(row.getValue("status"))}
-      </div>
+      <div className="text-center">{row.getValue("status")}</div>
     ),
   },
   {

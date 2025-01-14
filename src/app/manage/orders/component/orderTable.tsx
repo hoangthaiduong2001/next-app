@@ -28,7 +28,6 @@ import { useSearchParams } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 import OrderStatics from "@/app/manage/orders/component/OrderStatics";
-import { useOrderService } from "@/app/manage/orders/orderService";
 import { OrderStatusValues } from "@/constants/type";
 
 import { endOfDay, startOfDay } from "date-fns";
@@ -36,15 +35,15 @@ import { endOfDay, startOfDay } from "date-fns";
 import AutoPagination from "@/components/component/autoPagination";
 
 import TableSkeleton from "@/components/component/table/tableSkeleton";
-import { getVietnameseOrderStatus } from "@/config/utils";
 import { useGetOrderListQuery } from "@/hooks/useOrder";
 import { useGetListTable } from "@/hooks/useTable";
 import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
-import { columnDish, columnOrders } from "./column";
-import DatePicker from "./component/DatePicker";
-import FilterTableOrder from "./component/FilterTableOrder";
+import { columnDish, columnOrders } from "../column";
+import { useOrderService } from "../helper";
+import DatePicker from "./DatePicker";
+import FilterTableOrder from "./FilterTableOrder";
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -160,9 +159,7 @@ export default function OrderTable() {
         quantity,
       } = data;
       toast({
-        description: `Dish ${name} updated quantity: ${quantity} with status "${getVietnameseOrderStatus(
-          data.status
-        )}"`,
+        description: `Dish ${name} updated quantity: ${quantity} with status "${data.status}"`,
       });
       refetch();
     }

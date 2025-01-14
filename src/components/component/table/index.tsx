@@ -3,7 +3,7 @@
 import DatePicker from "@/app/manage/orders/component/DatePicker";
 import FilterTableOrder from "@/app/manage/orders/component/FilterTableOrder";
 import OrderStatics from "@/app/manage/orders/component/OrderStatics";
-import { useOrderService } from "@/app/manage/orders/orderService";
+import { useOrderService } from "@/app/manage/orders/helper";
 import { TDatePicker } from "@/app/manage/orders/type";
 import TableSkeleton from "@/components/component/table/tableSkeleton";
 import { Input } from "@/components/ui/input";
@@ -59,7 +59,6 @@ const CommonTable = <
   queryItemByDate,
   tableListSortedByNumber,
   onChoose,
-  setOpen,
 }: TTableProps<TRowDataType, TRowDataSort>) => {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
@@ -117,12 +116,6 @@ const CommonTable = <
       });
     }
   };
-
-  // const choose = (value: TRowDataType) => {
-  //   console.log("value", value);
-  //   onChoose?.(value);
-  //   setOpen?.(false);
-  // };
 
   useEffect(() => {
     table.setPagination({
@@ -189,7 +182,7 @@ const CommonTable = <
         ) : (
           <div className="flex items-center py-4">
             <Input
-              placeholder="Filter name"
+              placeholder={`Filter ${filterName}`}
               value={
                 (table.getColumn(filterName)?.getFilterValue() as string) ?? ""
               }

@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { getVietnameseDishStatus, handleErrorApi } from "@/config/utils";
+import { handleErrorApi } from "@/config/utils";
 import { DishStatusValues } from "@/constants/type";
 import { useGetDishById, useUpdateDish } from "@/hooks/useDish";
 import { useUploadMediaMutation } from "@/hooks/useMedia";
@@ -237,7 +237,7 @@ export default function EditDish({ id, setId, onSubmitSuccess }: TEditDish) {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="description">Status</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Select onValueChange={onChange} defaultValue={value}>
+                        <Select onValueChange={onChange} value={value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select status" />
@@ -246,7 +246,7 @@ export default function EditDish({ id, setId, onSubmitSuccess }: TEditDish) {
                           <SelectContent>
                             {DishStatusValues.map((status) => (
                               <SelectItem key={status} value={status}>
-                                {getVietnameseDishStatus(status)}
+                                {status}
                               </SelectItem>
                             ))}
                           </SelectContent>

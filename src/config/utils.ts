@@ -2,7 +2,7 @@
 import { authApiRequest } from "@/apiRequest/auth";
 import { guestApiRequest } from "@/apiRequest/guest";
 import envConfig from "@/config";
-import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
+import { OrderStatus, Role } from "@/constants/type";
 import { toast } from "@/hooks/useToast";
 import { TokenPayload } from "@/types/auth";
 import { clsx, type ClassValue } from "clsx";
@@ -87,37 +87,11 @@ export const handleCheckAndRefreshToken = async (param?: {
   }
 };
 
-export const getVietnameseDishStatus = (
-  status: (typeof DishStatus)[keyof typeof DishStatus]
-) => {
-  switch (status) {
-    case DishStatus.Available:
-      return "Available";
-    case DishStatus.Unavailable:
-      return "Unavailable";
-    default:
-      return "Hide";
-  }
-};
-
 export const formatCurrency = (number: number) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
   }).format(number);
-};
-
-export const getVietnameseTableStatus = (
-  status: (typeof TableStatus)[keyof typeof TableStatus]
-) => {
-  switch (status) {
-    case TableStatus.Available:
-      return "Available";
-    case TableStatus.Reserved:
-      return "Reserved";
-    default:
-      return "Hidden";
-  }
 };
 
 export const getTableLink = ({
@@ -155,23 +129,6 @@ export const formatDateTimeToLocaleString = (date: string | Date) => {
     date instanceof Date ? date : new Date(date),
     "HH:mm:ss dd/MM/yyyy"
   );
-};
-
-export const getVietnameseOrderStatus = (
-  status: (typeof OrderStatus)[keyof typeof OrderStatus]
-) => {
-  switch (status) {
-    case OrderStatus.Delivered:
-      return "Delivered";
-    case OrderStatus.Paid:
-      return "Paid";
-    case OrderStatus.Pending:
-      return "Pending";
-    case OrderStatus.Processing:
-      return "Processing";
-    default:
-      return "Reject";
-  }
 };
 
 export const OrderStatusIcon = {
