@@ -1,4 +1,3 @@
-import { getVietnameseOrderStatus } from "@/config/utils";
 import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
@@ -37,9 +36,7 @@ export const handleOrderSocket = <T extends IPlainObject>(
       quantity,
     } = data;
     toast({
-      description: `Dish ${name} updated quantity: ${quantity} with status "${getVietnameseOrderStatus(
-        data.status
-      )}"`,
+      description: `Dish ${name} updated quantity: ${quantity} with status "${data.status}"`,
     });
     refetch();
   }

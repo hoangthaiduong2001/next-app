@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, getVietnameseOrderStatus } from "@/config/utils";
+import { formatCurrency } from "@/config/utils";
 import { useGuestGetOrderList } from "@/hooks/useGuest";
 import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
@@ -36,9 +36,7 @@ const OrdersCart = () => {
         quantity,
       } = data;
       toast({
-        description: `Dish ${name} updated quantity: ${quantity} with status "${getVietnameseOrderStatus(
-          data.status
-        )}"`,
+        description: `Dish ${name} updated quantity: ${quantity} with status "${data.status}"`,
       });
       refetch();
     }
@@ -77,9 +75,7 @@ const OrdersCart = () => {
             </div>
           </div>
           <div className="flex-shrink-0 ml-auto flex justify-center items-center">
-            <Badge variant="outline">
-              {getVietnameseOrderStatus(order.status)}
-            </Badge>
+            <Badge variant="outline">{order.status}</Badge>
           </div>
         </div>
       ))}

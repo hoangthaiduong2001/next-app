@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdownMenu";
-import { formatCurrency, getVietnameseDishStatus } from "@/config/utils";
+import { formatCurrency } from "@/config/utils";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import { useContext } from "react";
@@ -69,9 +69,7 @@ export const columnsDish: ColumnDef<DishItem>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="text-center">
-        {getVietnameseDishStatus(row.getValue("status"))}
-      </div>
+      <div className="text-center">{row.getValue("status")}</div>
     ),
   },
   {
@@ -84,7 +82,7 @@ export const columnsDish: ColumnDef<DishItem>[] = [
       };
 
       const openDeleteDish = () => {
-        setItemDelete(row.original);
+        setItemDelete?.(row.original);
       };
       return (
         <DropdownMenu>

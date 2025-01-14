@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getVietnameseTableStatus, handleErrorApi } from "@/config/utils";
+import { handleErrorApi } from "@/config/utils";
 import { TableStatusValues } from "@/constants/type";
 import { useAddTable } from "@/hooks/useTable";
 import { toast } from "@/hooks/useToast";
@@ -150,12 +150,12 @@ export default function AddTable() {
               <FormField
                 control={control}
                 name="status"
-                render={({ field: { value, onChange } }) => (
+                render={({ field: { onChange } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="description">Status</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Select onValueChange={onChange} defaultValue={value}>
+                        <Select onValueChange={onChange}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Choose status" />
@@ -164,7 +164,7 @@ export default function AddTable() {
                           <SelectContent>
                             {TableStatusValues.map((status) => (
                               <SelectItem key={status} value={status}>
-                                {getVietnameseTableStatus(status)}
+                                {status}
                               </SelectItem>
                             ))}
                           </SelectContent>

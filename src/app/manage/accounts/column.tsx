@@ -79,7 +79,7 @@ export const columnsAccount: ColumnDef<AccountType>[] = [
       };
 
       const openDeleteEmployee = () => {
-        setItemDelete(row.original);
+        setItemDelete?.(row.original);
       };
       return (
         <DropdownMenu>

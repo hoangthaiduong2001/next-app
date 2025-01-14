@@ -5,12 +5,9 @@ import {
 } from "@/components/component/table/type";
 import { endOfDay, startOfDay } from "date-fns";
 import { createContext } from "react";
-import { DishItem } from "../dishes/type";
-import { TableItem } from "../tables/type";
-import { TFilterValue, TOrders } from "./type";
+import { TDish, TFilterValue, TGuest, TOrders, TTable } from "./type";
 
 export const initFromDate = startOfDay(new Date());
-
 export const initToDate = endOfDay(new Date());
 
 export const filterValue: TFilterValue[] = [
@@ -35,12 +32,17 @@ export const OrderTableContext = createContext<IItemTableContext<TOrders>>({
   orderObjectByGuestId: {} as OrderObjectByGuestID,
 });
 
-export const TableItemContext = createContext<IItemTableContext<TableItem>>({
+export const TableItemContext = createContext<IItemTableContext<TTable>>({
   itemIdEdit: undefined,
   setItemIdEdit: (value: number | undefined) => {},
 });
 
-export const DishTableContext = createContext<IItemTableContext<DishItem>>({
+export const DishTableContext = createContext<IItemTableContext<TDish>>({
+  itemIdEdit: undefined,
+  setItemIdEdit: (value: number | undefined) => {},
+});
+
+export const GuestTableContext = createContext<IItemTableContext<TGuest>>({
   itemIdEdit: undefined,
   setItemIdEdit: (value: number | undefined) => {},
 });

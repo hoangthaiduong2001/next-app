@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import { useState } from "react";
-import { columnTable } from "./column";
-import { TableItemContext } from "./const";
-import { TTable } from "./type";
+import { columnTable } from "../column";
+import { TableItemContext } from "../const";
+import { TTable } from "../type";
 
 export function TablesOfTable({
   onChoose,

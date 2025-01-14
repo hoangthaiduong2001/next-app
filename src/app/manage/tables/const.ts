@@ -9,12 +9,6 @@ export const defaultValueAddable = {
   status: TableStatus.Hidden,
 };
 
-export const defaultValueEditTable = {
-  capacity: 2,
-  status: TableStatus.Hidden,
-  changeToken: false,
-};
-
 export const TableContext = createContext<IItemTableContext<TableItem>>({
   itemIdEdit: undefined,
   itemDelete: null,

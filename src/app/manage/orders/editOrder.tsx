@@ -1,5 +1,5 @@
 "use client";
-import { TableDish } from "@/app/manage/orders/tableDish";
+import { TableDish } from "@/app/manage/orders/component/tableDish";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getVietnameseOrderStatus } from "@/config/utils";
 import { OrderStatus, OrderStatusValues } from "@/constants/type";
 import { DishListResType } from "@/schemaValidations/dish.schema";
 import {
@@ -130,7 +129,7 @@ export default function EditOrder({
               <FormField
                 control={control}
                 name="dishId"
-                render={({ field }) => (
+                render={({ field: { onChange } }) => (
                   <FormItem className="grid grid-cols-4 items-center justify-items-start gap-4">
                     <FormLabel>Dish</FormLabel>
                     <div className="flex items-center col-span-2 space-x-4">
@@ -142,10 +141,9 @@ export default function EditOrder({
                       </Avatar>
                       <div>{selectedDish?.name}</div>
                     </div>
-
                     <TableDish
                       onChoose={(dish) => {
-                        field.onChange(dish.id);
+                        onChange(dish.id);
                         setSelectedDish(dish);
                       }}
                     />
@@ -198,7 +196,7 @@ export default function EditOrder({
                         <SelectContent>
                           {OrderStatusValues.map((status) => (
                             <SelectItem key={status} value={status}>
-                              {getVietnameseOrderStatus(status)}
+                              {status}
                             </SelectItem>
                           ))}
                         </SelectContent>

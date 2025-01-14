@@ -25,11 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  getTableLink,
-  getVietnameseTableStatus,
-  handleErrorApi,
-} from "@/config/utils";
+import { getTableLink, handleErrorApi } from "@/config/utils";
 import { TableStatusValues } from "@/constants/type";
 import { useGetTableById, useUpdateTable } from "@/hooks/useTable";
 import { toast } from "@/hooks/useToast";
@@ -157,7 +153,7 @@ export default function EditTable({ id, setId, onSubmitSuccess }: TEditTable) {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="description">Status</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Select onValueChange={onChange} defaultValue={value}>
+                        <Select onValueChange={onChange} value={value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Choose status" />
@@ -166,13 +162,12 @@ export default function EditTable({ id, setId, onSubmitSuccess }: TEditTable) {
                           <SelectContent>
                             {TableStatusValues.map((status) => (
                               <SelectItem key={status} value={status}>
-                                {getVietnameseTableStatus(status)}
+                                {status}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
-
                       <FormMessage />
                     </div>
                   </FormItem>
