@@ -75,3 +75,7 @@
     pointer-events: auto !important;
   }
 }
+
+::-webkit-scrollbar {
+  display: none;
+}

@@ -33,17 +33,19 @@ export function TableDish({ onChoose }: { onChoose: (dish: TDish) => void }) {
         <DialogHeader>
           <DialogTitle>Choose dish</DialogTitle>
         </DialogHeader>
-        <CommonTable<TDish>
-          tableContext={DishTableContext}
-          AddItem={() => null}
-          EditItem={() => null}
-          onChoose={chooseDish}
-          data={data}
-          columns={columnDish}
-          name="dish"
-          pathname="/manage/dishes"
-          filterName="dishName"
-        />
+        <div className="h-[75vh]">
+          <CommonTable<TDish>
+            tableContext={DishTableContext}
+            AddItem={() => null}
+            EditItem={() => null}
+            onChoose={chooseDish}
+            data={data}
+            columns={columnDish}
+            name="dish"
+            pathname="/manage/dishes"
+            filterName="dishName"
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );
