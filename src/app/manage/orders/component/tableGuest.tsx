@@ -35,17 +35,19 @@ export default function TableGuest({
         <DialogHeader>
           <DialogTitle>Select guests</DialogTitle>
         </DialogHeader>
-        <CommonTable<TGuest>
-          tableContext={GuestTableContext}
-          AddItem={() => null}
-          EditItem={() => null}
-          onChoose={chooseGuest}
-          data={data}
-          columns={columnGuest}
-          name="Guest"
-          pathname="/manage/Guests"
-          filterName="name"
-        />
+        <div className="h-[75vh]">
+          <CommonTable<TGuest>
+            tableContext={GuestTableContext}
+            AddItem={() => null}
+            EditItem={() => null}
+            onChoose={chooseGuest}
+            data={data}
+            columns={columnGuest}
+            name="Guest"
+            pathname="/manage/Guests"
+            filterName="name"
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

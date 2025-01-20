@@ -36,6 +36,7 @@ export default function DropdownAvatar() {
       toast({ description: "Can not logout" });
     }
   };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

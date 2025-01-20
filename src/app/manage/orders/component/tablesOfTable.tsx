@@ -37,17 +37,19 @@ export function TablesOfTable({
         <DialogHeader>
           <DialogTitle>Select table</DialogTitle>
         </DialogHeader>
-        <CommonTable<TTable>
-          tableContext={TableItemContext}
-          AddItem={() => null}
-          EditItem={() => null}
-          onChoose={chooseTable}
-          data={data}
-          columns={columnTable}
-          name="table"
-          pathname="/manage/Tables"
-          filterName="number"
-        />
+        <div className="h-[75vh]">
+          <CommonTable<TTable>
+            tableContext={TableItemContext}
+            AddItem={() => null}
+            EditItem={() => null}
+            onChoose={chooseTable}
+            data={data}
+            columns={columnTable}
+            name="table"
+            pathname="/manage/Tables"
+            filterName="number"
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );
