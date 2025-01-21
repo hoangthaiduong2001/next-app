@@ -199,7 +199,7 @@ const CommonTable = <
         ) : (
           <div className="rounded-md border">
             <Table>
-              <TableHeader>
+              <TableHeader className="top-0 sticky bg-background">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
@@ -217,7 +217,7 @@ const CommonTable = <
                   </TableRow>
                 ))}
               </TableHeader>
-              <TableBody>
+              <TableBody className="overflow-y-scroll max-h-[70vh]">
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
@@ -260,7 +260,7 @@ const CommonTable = <
             </Table>
           </div>
         )}
-        <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex items-center justify-end space-x-2 pt-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
             Display <strong>{table.getPaginationRowModel().rows.length}</strong>{" "}
             in <strong>{data.length}</strong> result
