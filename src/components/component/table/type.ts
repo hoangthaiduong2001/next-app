@@ -49,6 +49,7 @@ export type TTableProps<
   queryItemByDate?: TDatePicker;
   tableListSortedByNumber?: TRowDataSort;
   onChoose?: (value: TRowDataType) => void;
+  changeStatus?: (body: TChangeStatusOrder) => Promise<void>;
 };
 
 export interface IItemTableContext<T extends IPlainObject> {

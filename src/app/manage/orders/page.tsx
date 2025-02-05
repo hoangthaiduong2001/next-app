@@ -9,8 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { useGetOrderListQuery } from "@/hooks/useOrder";
+import { TChangeStatusOrder } from "@/components/component/table/type";
+import { handleErrorApi } from "@/config/utils";
+import { useGetOrderListQuery, useUpdateOrderMutation } from "@/hooks/useOrder";
 import { useGetListTable } from "@/hooks/useTable";
+import { toast } from "@/hooks/useToast";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import { Suspense, useState } from "react";
 import AddOrder from "./addOrder";
@@ -23,10 +26,23 @@ export default function OrdersPage() {
   const [fromDate, setFromDate] = useState(initFromDate);
   const [toDate, setToDate] = useState(initToDate);
   const getTableList = useGetListTable();
+  const { mutate: updateOrder } = useUpdateOrderMutation();
   const getOrderListQuery = useGetOrderListQuery({ fromDate, toDate });
   const data = getOrderListQuery.data?.response.data ?? [];
   const tableList = getTableList.data?.response.data ?? [];
   const tableListSortedByNumber = tableList.sort((a, b) => a.number - b.number);
+  const changeStatus = async (body: TChangeStatusOrder) => {
+    updateOrder(body, {
+      onSuccess: (data) => {
+        toast({ description: data.response.message });
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+        });
+      },
+    });
+  };
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <div className="space-y-2">
@@ -42,6 +58,7 @@ export default function OrdersPage() {
                 EditItem={EditOrder}
                 tableContext={OrderTableContext}
                 data={data}
+                changeStatus={changeStatus}
                 columns={columnOrders}
                 queryListItem={getOrderListQuery}
                 tableListSortedByNumber={tableListSortedByNumber}
