@@ -26,14 +26,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { handleErrorApi } from "@/config/utils";
 import { OrderStatus, OrderStatusValues } from "@/constants/type";
+import {
+  useGetOrderDetailQuery,
+  useUpdateOrderMutation,
+} from "@/hooks/useOrder";
+import { toast } from "@/hooks/useToast";
 import { DishListResType } from "@/schemaValidations/dish.schema";
 import {
   UpdateOrderBody,
   UpdateOrderBodyType,
 } from "@/schemaValidations/order.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const fakeOrderDetail = {
@@ -84,10 +90,14 @@ export default function EditOrder({
   setId: (value: number | undefined) => void;
   onSubmitSuccess?: () => void;
 }) {
-  const [selectedDish, setSelectedDish] = useState<DishListResType["data"][0]>(
-    fakeOrderDetail.dishSnapshot as any
-  );
-  const orderDetail = fakeOrderDetail;
+  const [selectedDish, setSelectedDish] = useState<
+    DishListResType["data"][0] | null
+  >(null);
+  const { mutate: updateOrder, status } = useUpdateOrderMutation();
+  const data = useGetOrderDetailQuery({
+    orderId: Number(id),
+    enabled: Boolean(id),
+  }).data;
   const form = useForm<UpdateOrderBodyType>({
     resolver: zodResolver(UpdateOrderBody),
     defaultValues: {
@@ -97,13 +107,41 @@ export default function EditOrder({
     },
   });
 
-  const { control, handleSubmit } = form;
+  const { control, handleSubmit, setError } = form;
 
-  const onSubmit = async (values: UpdateOrderBodyType) => {};
+  const onSubmit = async (values: UpdateOrderBodyType) => {
+    if (status === "pending") return;
+    let body: UpdateOrderBodyType & { orderId: number } = {
+      orderId: Number(id),
+      ...values,
+    };
+    updateOrder(body, {
+      onSuccess: (data) => {
+        toast({ description: data.response.message });
+        reset();
+        onSubmitSuccess?.();
+      },
+      onError: (error) => {
+        handleErrorApi({ error, setError });
+      },
+    });
+  };
 
   const reset = () => {
     setId(undefined);
   };
+
+  useEffect(() => {
+    if (data) {
+      const {
+        status,
+        dishSnapshot: { dishId },
+        quantity,
+      } = data.response.data;
+      form.reset({ status, dishId: dishId ?? 0, quantity });
+      setSelectedDish(data?.response.data.dishSnapshot);
+    }
+  }, [data, form]);
 
   return (
     <Dialog
