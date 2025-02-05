@@ -36,7 +36,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AutoPagination from "../autoPagination";
 import CommonAlertDialog from "../CommonAlertDialog";
-import { changeStatus, PAGE_SIZE } from "./const";
+import { PAGE_SIZE } from "./const";
 import { handleOrderSocket } from "./helper";
 import { IItemTableContext, TTableProps } from "./type";
 
@@ -59,6 +59,7 @@ const CommonTable = <
   queryItemByDate,
   tableListSortedByNumber,
   onChoose,
+  changeStatus,
 }: TTableProps<TRowDataType, TRowDataSort>) => {
   const searchParam = useSearchParams();
   const page = searchParam.get("page") ? Number(searchParam.get("page")) : 1;
