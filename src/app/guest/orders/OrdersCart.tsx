@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/config/utils";
+import { OrderStatus } from "@/constants/type";
 import { useGuestGetOrderList } from "@/hooks/useGuest";
 import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
@@ -12,10 +13,37 @@ import { useEffect, useMemo } from "react";
 const OrdersCart = () => {
   const { data, refetch } = useGuestGetOrderList();
   const orders = data?.response.data ?? [];
-  const totalPrice = useMemo(() => {
-    return orders.reduce((result, order) => {
-      return result + order.dishSnapshot.price * order.quantity;
-    }, 0);
+  const { unpaid, paid } = useMemo(() => {
+    return orders.reduce(
+      (result, order) => {
+        if (
+          order.status === OrderStatus.Delivered ||
+          order.status === OrderStatus.Processing ||
+          order.status === OrderStatus.Pending
+        ) {
+          return {
+            ...result,
+            unpaid: {
+              price:
+                result.unpaid.price + order.dishSnapshot.price * order.quantity,
+              quantity: result.unpaid.quantity + order.quantity,
+            },
+          };
+        }
+        if (order.status === OrderStatus.Paid) {
+          return {
+            ...result,
+            paid: {
+              price:
+                result.paid.price + order.dishSnapshot.price * order.quantity,
+              quantity: result.unpaid.quantity + order.quantity,
+            },
+          };
+        }
+        return result;
+      },
+      { unpaid: { price: 0, quantity: 0 }, paid: { price: 0, quantity: 0 } }
+    );
   }, [orders]);
   useEffect(() => {
     if (socket.connected) {
@@ -41,14 +69,23 @@ const OrdersCart = () => {
       refetch();
     }
 
+    function onPayment() {
+      toast({
+        description: "You payment success",
+      });
+      refetch();
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("update-order", onUpdateOrder);
+    socket.on("payment", onPayment);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("update-order", onUpdateOrder);
+      socket.off("payment", onPayment);
     };
   }, []);
   return (
@@ -79,10 +116,18 @@ const OrdersCart = () => {
           </div>
         </div>
       ))}
+      {paid.quantity !== 0 && (
+        <div className="sticky bottom-0">
+          <div className="w-full flex space-x-4 text-xl font-semibold">
+            <span>Paid &bull; {paid.quantity} dish</span>
+            <span>{formatCurrency(paid.price)}</span>
+          </div>
+        </div>
+      )}
       <div className="sticky bottom-0">
         <div className="w-full flex space-x-4 text-xl font-semibold">
-          <span>Total &bull; {orders.length} dish</span>
-          <span>{formatCurrency(totalPrice)}</span>
+          <span>Unpaid &bull; {unpaid.quantity} dish</span>
+          <span>{formatCurrency(unpaid.price)}</span>
         </div>
       </div>
     </>
