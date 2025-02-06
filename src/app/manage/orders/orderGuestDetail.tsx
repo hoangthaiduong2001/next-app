@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import {
   formatCurrency,
   formatDateTimeToLocaleString,
+  handleErrorApi,
   OrderStatusIcon,
 } from "@/config/utils";
 import { OrderStatus } from "@/constants/type";
+import { usePayOrderMutation } from "@/hooks/useOrder";
+import { toast } from "@/hooks/useToast";
 
 import { GetOrdersResType } from "@/schemaValidations/order.schema";
 import Image from "next/image";
@@ -18,9 +21,11 @@ type Orders = GetOrdersResType["data"];
 export default function OrderGuestDetail({
   guest,
   orders,
+  onPaySuccess,
 }: {
   guest: Guest;
   orders: Orders;
+  onPaySuccess?: () => void;
 }) {
   const ordersFilterToPurchase = guest
     ? orders.filter(
@@ -32,6 +37,22 @@ export default function OrderGuestDetail({
   const purchasedOrderFilter = guest
     ? orders.filter((order) => order.status === OrderStatus.Paid)
     : [];
+  const { mutate: payOrder, status } = usePayOrderMutation();
+  const pay = () => {
+    if (status === "pending" || !guest) return;
+    payOrder(
+      { guestId: guest.id },
+      {
+        onSuccess: (data) => {
+          toast({ description: data.response.message });
+          onPaySuccess && onPaySuccess();
+        },
+        onError: (error) => {
+          handleErrorApi({ error });
+        },
+      }
+    );
+  };
   return (
     <div className="space-y-2 text-sm">
       {guest && (
@@ -149,6 +170,7 @@ export default function OrderGuestDetail({
           size={"sm"}
           variant={"secondary"}
           disabled={ordersFilterToPurchase.length === 0}
+          onClick={pay}
         >
           Pay all ({ordersFilterToPurchase.length} order)
         </Button>

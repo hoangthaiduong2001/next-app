@@ -1,5 +1,11 @@
 import http from "@/config/http";
 import {
+  CreateGuestBodyType,
+  CreateGuestResType,
+  GetGuestListQueryParamsType,
+  GetListGuestsResType,
+} from "@/schemaValidations/account.schema";
+import {
   LoginResType,
   LogoutBodyType,
   RefreshTokenBodyType,
@@ -13,6 +19,7 @@ import {
   GuestLoginBodyType,
   GuestLoginResType,
 } from "@/schemaValidations/guest.schema";
+import queryString from "query-string";
 
 type TRefreshTokenKey = {
   status: number;
@@ -63,4 +70,14 @@ export const guestApiRequest = {
   order: (body: GuestCreateOrdersBodyType) =>
     http.post<GuestCreateOrdersResType>("/guest/orders", body),
   getOrderList: () => http.get<GuestGetOrdersResType>("/guest/orders"),
+  guestList: (queryParam: GetGuestListQueryParamsType) =>
+    http.get<GetListGuestsResType>(
+      "/accounts/guests?" +
+        queryString.stringify({
+          fromDate: queryParam.fromDate?.toISOString(),
+          toDate: queryParam.toDate?.toISOString(),
+        })
+    ),
+  createGuest: (body: CreateGuestBodyType) =>
+    http.post<CreateGuestResType>("/accounts/guests", body),
 };

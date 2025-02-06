@@ -1,7 +1,10 @@
 import { toast } from "@/hooks/useToast";
 import socket from "@/lib/socket";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
-import { UpdateOrderResType } from "@/schemaValidations/order.schema";
+import {
+  PayGuestOrdersResType,
+  UpdateOrderResType,
+} from "@/schemaValidations/order.schema";
 import { IPlainObject } from "@/types/common";
 import { UseQueryResult } from "@tanstack/react-query";
 import { TData } from "./type";
@@ -49,15 +52,25 @@ export const handleOrderSocket = <T extends IPlainObject>(
     refetch();
   }
 
+  function onPayment(data: PayGuestOrdersResType["data"]) {
+    const { guest } = data[0];
+    toast({
+      description: `${guest?.name} payment success ${data?.length} orders`,
+    });
+    refetch();
+  }
+
   socket.on("connect", onConnect);
   socket.on("disconnect", onDisconnect);
   socket.on("update-order", onUpdateOrder);
   socket.on("new-order", onNewOrder);
+  socket.on("payment", onPayment);
 
   return () => {
     socket.off("connect", onConnect);
     socket.off("disconnect", onDisconnect);
     socket.off("update-order", onUpdateOrder);
     socket.off("new-order", onNewOrder);
+    socket.off("payment", onPayment);
   };
 };
