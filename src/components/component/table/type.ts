@@ -34,9 +34,11 @@ export type TTableProps<
   TRowDataSort extends IPlainObject = object[]
 > = {
   name: string;
-  pathname: string;
+  pathname?: string;
   filterName: string;
   deleteById?: boolean;
+  filterDatePicker?: boolean;
+  isLink?: boolean;
   isOrder?: boolean;
   columns: ColumnDef<TRowDataType>[];
   data: TRowDataType[];
