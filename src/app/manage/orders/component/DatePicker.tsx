@@ -24,7 +24,11 @@ const DatePicker = ({
             placeholder="From date"
             className="text-sm"
             value={format(fromDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
-            onChange={(event) => setFromDate(new Date(event.target.value))}
+            onChange={(event) => {
+              const selectedDate = new Date(event.target.value);
+              setFromDate(selectedDate);
+              event.target.hidden = true;
+            }}
           />
         </div>
         <div className="flex items-center">
@@ -33,7 +37,11 @@ const DatePicker = ({
             type="datetime-local"
             placeholder="To date"
             value={format(toDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
-            onChange={(event) => setToDate(new Date(event.target.value))}
+            onChange={(event) => {
+              const selectedDate = new Date(event.target.value);
+              setToDate(new Date(selectedDate));
+              event.target.hidden = true;
+            }}
           />
         </div>
         <Button className="" variant={"outline"} onClick={resetDateFilter}>

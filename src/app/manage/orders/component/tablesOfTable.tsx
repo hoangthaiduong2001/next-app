@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useGetListTable } from "@/hooks/useTable";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import { useState } from "react";
 import { columnTable } from "../column";
@@ -21,7 +22,8 @@ export function TablesOfTable({
   onChoose: (table: TTable) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const data: TableListResType["data"] = [];
+  const tableList = useGetListTable();
+  const data: TableListResType["data"] = tableList.data?.response.data ?? [];
 
   const chooseTable = (table: TTable) => {
     onChoose(table);
@@ -46,7 +48,7 @@ export function TablesOfTable({
             data={data}
             columns={columnTable}
             name="table"
-            pathname="/manage/Tables"
+            isLink
             filterName="number"
           />
         </div>

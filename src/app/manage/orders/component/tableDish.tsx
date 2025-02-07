@@ -42,7 +42,7 @@ export function TableDish({ onChoose }: { onChoose: (dish: TDish) => void }) {
             data={data}
             columns={columnDish}
             name="dish"
-            pathname="/manage/dishes"
+            isLink
             filterName="dishName"
           />
         </div>

@@ -51,10 +51,12 @@ const CommonTable = <
   AddItem,
   EditItem,
   name,
-  pathname,
+  isLink = false,
+  pathname = "/",
   filterName,
   deleteById = true,
   isOrder = false,
+  filterDatePicker = false,
   queryListItem,
   queryItemByDate,
   tableListSortedByNumber,
@@ -181,19 +183,34 @@ const CommonTable = <
             />
           </>
         ) : (
-          <div className="flex items-center py-4">
-            <Input
-              placeholder={`Filter ${filterName}`}
-              value={
-                (table.getColumn(filterName)?.getFilterValue() as string) ?? ""
-              }
-              onChange={(e) =>
-                table.getColumn(filterName)?.setFilterValue(e.target.value)
-              }
-              className="max-w-sm"
-            />
-            <div className="ml-auto flex items-center gap-2">{<AddItem />}</div>
-          </div>
+          <>
+            <div>
+              {filterDatePicker && (
+                <DatePicker
+                  toDate={toDate}
+                  fromDate={fromDate}
+                  setToDate={setToDate}
+                  setFromDate={setFromDate}
+                />
+              )}
+            </div>
+            <div className="flex items-center py-4">
+              <Input
+                placeholder={`Filter ${filterName}`}
+                value={
+                  (table.getColumn(filterName)?.getFilterValue() as string) ??
+                  ""
+                }
+                onChange={(e) =>
+                  table.getColumn(filterName)?.setFilterValue(e.target.value)
+                }
+                className="max-w-sm"
+              />
+              <div className="ml-auto flex items-center gap-2">
+                {<AddItem />}
+              </div>
+            </div>
+          </>
         )}
         {queryListItem?.isPending ? (
           <TableSkeleton />
@@ -227,10 +244,7 @@ const CommonTable = <
                       onClick={
                         onChoose
                           ? () => {
-                              if (
-                                row.original.status === TableStatus.Available ||
-                                row.original.status === TableStatus.Reserved
-                              ) {
+                              if (row.original.status !== TableStatus.Hidden) {
                                 onChoose?.(row.original);
                               }
                             }
@@ -271,6 +285,14 @@ const CommonTable = <
               page={table.getState().pagination.pageIndex + 1}
               pageSize={table.getPageCount()}
               pathname={pathname}
+              isLink={isLink}
+              onClick={(pageNumber) =>
+                isLink &&
+                table.setPagination({
+                  pageIndex: pageNumber - 1,
+                  pageSize: PAGE_SIZE,
+                })
+              }
             />
           </div>
         </div>

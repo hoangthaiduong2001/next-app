@@ -9,7 +9,7 @@ type TQrCodeTable = {
   width?: number;
 };
 
-const QrCodeTable = ({ token, tableNumber, width = 250 }: TQrCodeTable) => {
+const QrCodeTable = ({ token, tableNumber }: TQrCodeTable) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,7 +24,7 @@ const QrCodeTable = ({ token, tableNumber, width = 250 }: TQrCodeTable) => {
       }
     );
   }, [token, tableNumber]);
-  return <canvas ref={canvasRef} />;
+  return <canvas ref={canvasRef} width={120} height={120} />;
 };
 
 export default QrCodeTable;

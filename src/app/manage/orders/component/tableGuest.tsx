@@ -7,10 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useGetGuestListQuery } from "@/hooks/useGuest";
 import { GetListGuestsResType } from "@/schemaValidations/account.schema";
 import { useState } from "react";
 import { columnGuest } from "../column";
-import { GuestTableContext } from "../const";
+import { GuestTableContext, initFromDate, initToDate } from "../const";
 import { TGuest } from "../type";
 
 export default function TableGuest({
@@ -19,7 +20,14 @@ export default function TableGuest({
   onChoose: (guest: TGuest) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const data: GetListGuestsResType["data"] = [];
+  const [fromDate, setFromDate] = useState(initFromDate);
+  const [toDate, setToDate] = useState(initToDate);
+  const guestList = useGetGuestListQuery({
+    fromDate: initFromDate,
+    toDate: initToDate,
+  });
+  const data: GetListGuestsResType["data"] =
+    guestList.data?.response.data ?? [];
 
   const chooseGuest = (guest: TGuest) => {
     onChoose(guest);
@@ -42,9 +50,11 @@ export default function TableGuest({
             EditItem={() => null}
             onChoose={chooseGuest}
             data={data}
+            filterDatePicker
             columns={columnGuest}
+            queryItemByDate={{ fromDate, toDate, setFromDate, setToDate }}
             name="Guest"
-            pathname="/manage/Guests"
+            isLink
             filterName="name"
           />
         </div>
